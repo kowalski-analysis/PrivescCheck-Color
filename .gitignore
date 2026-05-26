@@ -1,0 +1,15 @@
+# Report output files
+*.txt
+*.html
+*.csv
+*.xml
+
+# Do not commit the base script -- users supply their own copy or let the
+# wrapper download it. Committing it would create a stale embedded copy.
+PrivescCheck.ps1
+
+# Editor state
+.vscode/
+*.swp
+*~
+.DS_Store
