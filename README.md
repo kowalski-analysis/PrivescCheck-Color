@@ -176,7 +176,7 @@ All vulnerability detection, enumeration logic, severity classification, and the
 | Original project | https://github.com/itm4n/PrivescCheck |
 | Original license | BSD 3-Clause |
 
-This wrapper was written by [kowalski-analysis](https://github.com/kowalski-analysis) for OSCP exam preparation and authorized engagement use. If you find it useful, consider starring the original PrivescCheck repository.
+This wrapper was written by [kowalski-analysis](https://github.com/kowalski-analysis) for pentesting certification exam preparations and authorized engagement use. If you find it useful, consider starring the original PrivescCheck repository.
 
 ---
 
