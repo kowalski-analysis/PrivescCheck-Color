@@ -279,8 +279,8 @@ function script:Write-Summary {
     Write-Host ""
 
     $line = @(
-        (cc "Actionable (+): $highs" "Red"   -B),
-        (cc "  Info (*): $infos"     "Cyan"    ),
+        (cc ("Actionable [+]: " + $highs) "Red" -B),
+        (cc ("  Info [*]: " + $infos) "Cyan"),
         (cc "  Total: $($script:AllResults.Count)" "White")
     ) -join "   "
     Write-Host "  $line"
@@ -986,7 +986,6 @@ function Get-UserPrivileges {
 
     if ($Success) {
 
-        Write-Verbose "OpenProcessToken() OK - Token handle: $TokenHandle"
 
         # TOKEN_INFORMATION_CLASS - 3 = TokenPrivileges
         $TokenPrivilegesPtrSize = 0
@@ -995,7 +994,6 @@ function Get-UserPrivileges {
 
         if (-not ($TokenPrivilegesPtrSize -eq 0)) {
 
-            Write-Verbose "GetTokenInformation() OK - TokenPrivilegesPtrSize = $TokenPrivilegesPtrSize"
 
             [IntPtr]$TokenPrivilegesPtr = [System.Runtime.InteropServices.Marshal]::AllocHGlobal($TokenPrivilegesPtrSize)
 
@@ -1011,7 +1009,6 @@ function Get-UserPrivileges {
                 # https://docs.microsoft.com/en-us/archive/blogs/jaredpar/properly-incrementing-an-intptr
                 $Offset = [IntPtr] ($TokenPrivilegesPtr.ToInt64() + 4)
                 
-                Write-Verbose "GetTokenInformation() OK - Privilege count: $($TokenPrivileges.PrivilegeCount)"
 
                 For ($i = 0; $i -lt $TokenPrivileges.PrivilegeCount; $i++) {
 
@@ -1030,7 +1027,6 @@ function Get-UserPrivileges {
 
                     if (-not ($Length -eq 0)) {
 
-                        Write-Verbose "LookupPrivilegeName() OK - Length = $Length"
 
                         $Name = New-Object -TypeName System.Text.StringBuilder
                         $Name.EnsureCapacity($Length + 1) |Out-Null
@@ -1044,7 +1040,6 @@ function Get-UserPrivileges {
                             # SE_PRIVILEGE_ENABLED = 0x00000002
                             $PrivilegeEnabled = ($LuidAndAttributes.Attributes -band 2) -eq 2
 
-                            Write-Verbose "LookupPrivilegeName() OK - Name: $PrivilegeName - Enabled: $PrivilegeEnabled"
 
                             $PrivilegeObject = New-Object -TypeName PSObject 
                             $PrivilegeObject | Add-Member -MemberType "NoteProperty" -Name "Name" -Value $PrivilegeName
@@ -1053,11 +1048,9 @@ function Get-UserPrivileges {
                             $PrivilegeObject
 
                         } else {
-                            Write-Verbose ([ComponentModel.Win32Exception] $LastError)
                         }
 
                     } else {
-                        Write-Verbose ([ComponentModel.Win32Exception] $LastError)
                     }
 
                     # Cleanup - Free unmanaged memory
@@ -1071,14 +1064,12 @@ function Get-UserPrivileges {
                 }
 
             } else {
-                Write-Verbose ([ComponentModel.Win32Exception] $LastError)
             }
 
             # Cleanup - Free unmanaged memory
             [System.Runtime.InteropServices.Marshal]::FreeHGlobal($TokenPrivilegesPtr)
 
         } else {
-            Write-Verbose ([ComponentModel.Win32Exception] $LastError)
         }
 
         # Cleanup - Close Token handle 
@@ -1087,11 +1078,9 @@ function Get-UserPrivileges {
         if ($Success) {
             Write-Verbose "Token handle closed"
         } else {
-            Write-Verbose ([ComponentModel.Win32Exception] $LastError)
         }
 
     } else {
-        Write-Verbose ([ComponentModel.Win32Exception] $LastError)
     }
 }
 
@@ -1165,7 +1154,6 @@ function Get-UserFromProcess() {
 
     if (-not ($Null -eq $ProcessHandle)) {
 
-        Write-Verbose "OpenProcess() OK - Handle: $ProcessHandle"
 
         $TOKEN_QUERY= 0x0008
         [IntPtr]$TokenHandle = [IntPtr]::Zero
@@ -1174,7 +1162,6 @@ function Get-UserFromProcess() {
 
         if ($Success) {
 
-            Write-Verbose "OpenProcessToken() OK - Handle: $ProcessHandle"
 
             # TOKEN_INFORMATION_CLASS - 1 = TokenUser
             $TokenUserPtrSize = 0
@@ -1183,7 +1170,6 @@ function Get-UserFromProcess() {
 
             if (($TokenUserPtrSize -gt 0) -and ($LastError -eq 122)) {
 
-                Write-Verbose "GetTokenInformation() OK - Size: $TokenUserPtrSize"
 
                 [IntPtr]$TokenUserPtr = [System.Runtime.InteropServices.Marshal]::AllocHGlobal($TokenUserPtrSize)
 
@@ -1192,7 +1178,6 @@ function Get-UserFromProcess() {
 
                 if ($Success) {
 
-                    Write-Verbose "GetTokenInformation() OK"
 
                     # Cast unmanaged memory to managed TOKEN_USER struct 
                     $TokenUser = [System.Runtime.InteropServices.Marshal]::PtrToStructure($TokenUserPtr, [type] [PrivescCheck.Win32+TOKEN_USER])
@@ -1220,12 +1205,8 @@ function Get-UserFromProcess() {
                         $UserObject
                         
                     } else {
-                        Write-Verbose "LookupAccountSid() failed."
-                        Write-Verbose ([ComponentModel.Win32Exception] $LastError)
                     }
                 } else {
-                    Write-Verbose "GetTokenInformation() failed."
-                    Write-Verbose ([ComponentModel.Win32Exception] $LastError)
                 }
 
                 # Cleanup - Free unmanaged memory 
@@ -1238,7 +1219,6 @@ function Get-UserFromProcess() {
             if ($Success) {
                 Write-Verbose "Token handle closed"
             } else {
-                Write-Verbose ([ComponentModel.Win32Exception] $LastError)
             }
         } else {
             Write-Verbose "Can't open token for process with PID $ProcessId"
@@ -1250,7 +1230,6 @@ function Get-UserFromProcess() {
         if ($Success) {
             Write-Verbose "Process handle closed"
         } else {
-            Write-Verbose ([ComponentModel.Win32Exception] $LastError)
         }
     } else {
         Write-Verbose "Can't open process with PID $ProcessId"
@@ -1337,7 +1316,6 @@ function Get-NetworkEndpoints {
 
     if ($Result -eq 122) {
 
-        Write-Verbose "GetExtendedProtoTable() OK - Size: $BufSize"
 
         [IntPtr]$TablePtr = [System.Runtime.InteropServices.Marshal]::AllocHGlobal($BufSize)
 
@@ -1367,7 +1345,6 @@ function Get-NetworkEndpoints {
             
             $NumEntries = $Table.dwNumEntries
 
-            Write-Verbose "GetExtendedProtoTable() OK - NumEntries: $NumEntries"
 
             $Offset = [IntPtr] ($TablePtr.ToInt64() + 4)
 
@@ -1415,13 +1392,11 @@ function Get-NetworkEndpoints {
             }
 
         } else {
-            Write-Verbose ([ComponentModel.Win32Exception] $LastError)
         }
 
         [System.Runtime.InteropServices.Marshal]::FreeHGlobal($TablePtr)
 
     } else {
-        Write-Verbose ([ComponentModel.Win32Exception] $LastError)
     }
 }
 
@@ -2157,7 +2132,6 @@ function Get-UEFIStatus {
                 $Description = "BIOS mode is unknown"
             }
         } else {
-            Write-Verbose ([ComponentModel.Win32Exception] $LastError)
         }
 
     # Windows = 7/2008 R2
@@ -2170,11 +2144,9 @@ function Get-UEFIStatus {
         if ($LastError -eq $ERROR_INVALID_FUNCTION) {
             $Status = $False 
             $Description = "BIOS mode is Legacy"
-            Write-Verbose ([ComponentModel.Win32Exception] $LastError)
         } else {
             $Status = $True 
             $Description = "BIOS mode is UEFI"
-            Write-Verbose ([ComponentModel.Win32Exception] $LastError)
         }
         
     } else {
@@ -3163,13 +3135,11 @@ function Invoke-WlanProfilesCheck {
         $Result = [PrivescCheck.Win32]::WlanOpenHandle(2, [IntPtr]::Zero, [ref]$NegotiatedVersion, [ref]$ClientHandle)
         if ($Result -eq $ERROR_SUCCESS) {
     
-            Write-Verbose "WlanOpenHandle() OK - Handle: $($ClientHandle)"
     
             [IntPtr]$InterfaceListPtr = [IntPtr]::Zero
             $Result = [PrivescCheck.Win32]::WlanEnumInterfaces($ClientHandle, [IntPtr]::Zero, [ref]$InterfaceListPtr)
             if ($Result -eq $ERROR_SUCCESS) {
     
-                Write-Verbose "WlanEnumInterfaces() OK - Interface list pointer: 0x$($InterfaceListPtr.ToString('X8'))"
     
                 $NumberOfInterfaces = [Runtime.InteropServices.Marshal]::ReadInt32($InterfaceListPtr)
                 Write-Verbose "Number of Wlan interfaces: $($NumberOfInterfaces)"
@@ -3187,7 +3157,6 @@ function Invoke-WlanProfilesCheck {
                     $Result = [PrivescCheck.Win32]::WlanGetProfileList($ClientHandle, $WlanInterfaceInfo.InterfaceGuid, [IntPtr]::Zero, [ref]$ProfileListPtr)
                     if ($Result -eq $ERROR_SUCCESS) {
     
-                        Write-Verbose "WlanGetProfileList() OK - Profile list pointer: 0x$($ProfileListPtr.ToString('X8'))"
     
                         $NumberOfProfiles = [Runtime.InteropServices.Marshal]::ReadInt32($ProfileListPtr)
                         Write-Verbose "Number of profiles: $($NumberOfProfiles)"
@@ -3207,14 +3176,12 @@ function Invoke-WlanProfilesCheck {
                             $Result = [PrivescCheck.Win32]::WlanGetProfile($ClientHandle, $WlanInterfaceInfo.InterfaceGuid, $WlanProfileInfo.strProfileName, [IntPtr]::Zero, [ref]$ProfileXml, [ref]$WlanProfileFlags, [ref]$WlanProfileAccessFlags)
                             if ($Result -eq $ERROR_SUCCESS) {
     
-                                Write-Verbose "WlanGetProfile() OK"
     
                                 $Item = Convert-ProfileXmlToObject -ProfileXml $ProfileXml
                                 $Item | Add-Member -MemberType "NoteProperty" -Name "Interface" -Value $WlanInterfaceInfo.strInterfaceDescription
                                 $Item
     
                             } else {
-                                Write-Verbose "WlanGetProfile() failed (Err: $($Result))"
                             }
     
                             # Calculate the pointer to the next WLAN_PROFILE_INFO structure 
@@ -3225,7 +3192,6 @@ function Invoke-WlanProfilesCheck {
                         [PrivescCheck.Win32]::WlanFreeMemory($ProfileListPtr)
     
                     } else {
-                        Write-Verbose "WlanGetProfileList() failed (Err: $($Result))"
                     }
     
                     # Calculate the pointer to the next WLAN_INTERFACE_INFO structure 
@@ -3236,19 +3202,15 @@ function Invoke-WlanProfilesCheck {
                 [PrivescCheck.Win32]::WlanFreeMemory($InterfaceListPtr)
     
             } else {
-                Write-Verbose "WlanEnumInterfaces() failed (Err: $($Result))"
             }
     
             # cleanup
             $Result = [PrivescCheck.Win32]::WlanCloseHandle($ClientHandle, [IntPtr]::Zero)
             if ($Result -eq $ERROR_SUCCESS) {
-                Write-Verbose "WlanCloseHandle() OK"
             } else {
-                Write-Verbose "WlanCloseHandle() failed (Err: $($Result))"
             }
     
         } else {
-            Write-Verbose "WlanOpenHandle() failed (Err: $($Result))"
         }
     } catch {
         # Do nothing
@@ -4304,7 +4266,6 @@ function Invoke-VaultCredCheck {
 
     if ($Success) {
 
-        Write-Verbose "CredEnumerate() OK - Count: $($Count)"
 
         # CredEnumerate() returns an array of $Count PCREDENTIAL pointers, so we need to iterate
         # this array in order to get each PCREDENTIAL pointer. Then we can use this pointer to 
@@ -4336,7 +4297,6 @@ function Invoke-VaultCredCheck {
         # If there is no saved credentials, CredEnumerate sets the last error to ERROR_NOT_FOUND 
         # but this doesn't mean that the function really failed. The same thing applies for 
         # the error code ERROR_NO_SUCH_LOGON_SESSION.
-        Write-Verbose ([ComponentModel.Win32Exception] $LastError)
     }
 }
 
@@ -4493,7 +4453,6 @@ function Invoke-VaultListCheck {
 
     if ($Result -eq 0) {
 
-        Write-Verbose "VaultEnumerateVaults() OK - Count: $($VaultsCount)"
 
         for ($i = 0; $i -lt $VaultsCount; $i++) {
 
@@ -4508,7 +4467,6 @@ function Invoke-VaultListCheck {
 
             if ($Result -eq 0) {
 
-                Write-Verbose "VaultOpenVault() OK - Vault Handle: 0x$($VaultHandle.ToString('X8'))"
 
                 $VaultItemsCount = 0
                 $ItemsPtr = [IntPtr]::Zero 
@@ -4518,7 +4476,6 @@ function Invoke-VaultListCheck {
 
                 if ($Result -eq 0) {
 
-                    Write-Verbose "VaultEnumerateItems() OK - Items Count: $($VaultItemsCount)"
 
                     $OSVersion = [Environment]::OSVersion.Version
 
@@ -4548,13 +4505,11 @@ function Invoke-VaultListCheck {
     
                             if ($Result -eq 0) {
 
-                                Write-Verbose "VaultGetItem() OK - ItemPtr: 0x$($PasswordItemPtr.ToString('X8'))"
                                 $PasswordItem = [Runtime.InteropServices.Marshal]::PtrToStructure($PasswordItemPtr, [Type] $VaultItemType)
                                 $Password = Get-VaultItemElementValue -VaultItemElementPtr $PasswordItem.Authenticator
                                 [PrivescCheck.Win32]::VaultFree($PasswordItemPtr) | Out-Null 
 
                             } else {
-                                Write-Verbose "VaultGetItem() failed - Err: 0x$($Result.ToString('X8'))"
                             }
     
                             if (-not [String]::IsNullOrEmpty($Password)) {
@@ -4575,18 +4530,15 @@ function Invoke-VaultListCheck {
                     }
 
                 } else {
-                    Write-Verbose "VaultEnumerateItems() failed - Err: 0x$($Result.ToString('X8'))"
                 }
 
                 [PrivescCheck.Win32]::VaultCloseVault([ref]$VaultHandle) | Out-Null 
 
             } else {
-                Write-Verbose "VaultOpenVault() failed - Err: 0x$($Result.ToString('X8'))"
             }
         }
 
     } else {
-        Write-Verbose "VaultEnumerateVaults() failed - Err: 0x$($Result.ToString('X8'))"
     }
 }
 
